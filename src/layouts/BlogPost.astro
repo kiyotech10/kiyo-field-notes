@@ -1,82 +1,70 @@
 ---
+import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
-import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+interface Props {
+	title: string;
+	description: string;
+	pubDate?: Date;
+	updatedDate?: Date;
+	heroImage?: ImageMetadata;
+	category?: string;
+}
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, category } = Astro.props;
+
+const categoryLabels: Record<string, string> = {
+	diary: 'Diary',
+	english: 'English',
+	study: 'Study',
+	reading: 'Reading',
+	nursing: 'Nursing',
+};
 ---
 
-<html lang="en">
+<html lang="ja">
 	<head>
 		<BaseHead title={title} description={description} />
-		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
-				margin: 0;
-			}
-			.hero-image {
-				width: 100%;
-			}
-			.hero-image img {
-				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
-			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
-			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
-			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
-			}
-			.last-updated-on {
-				font-style: italic;
-			}
-		</style>
 	</head>
-
 	<body>
 		<Header />
 		<main>
 			<article>
-				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+				{
+					heroImage && (
+						<div class="hero-image">
+							<Image width={720} height={360} src={heroImage} alt="" />
+						</div>
+					)
+				}
+				<div class="post-header">
+					{
+						category && (
+							<a href={`/${category}/`} class="back-link">
+								← {categoryLabels[category] ?? category}
+							</a>
+						)
+					}
+					<h1>{title}</h1>
+					{
+						pubDate && (
+							<div class="meta">
+								<FormattedDate date={pubDate} />
+								{updatedDate && (
+									<span class="updated">
+										（更新: <FormattedDate date={updatedDate} />）
+									</span>
+								)}
+							</div>
+						)
+					}
+					<hr />
 				</div>
 				<div class="prose">
-					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						<h1>{title}</h1>
-						<hr />
-					</div>
 					<slot />
 				</div>
 			</article>
@@ -84,3 +72,41 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		<Footer />
 	</body>
 </html>
+
+<style>
+	.hero-image {
+		margin-bottom: 2em;
+	}
+	.hero-image img {
+		display: block;
+		width: 100%;
+	}
+	.post-header {
+		margin-bottom: 1.5em;
+	}
+	.back-link {
+		display: inline-block;
+		font-size: 0.78em;
+		letter-spacing: 0.07em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+		text-decoration: none;
+		margin-bottom: 1.2em;
+	}
+	.back-link:hover {
+		color: var(--accent);
+	}
+	h1 {
+		font-size: 2em;
+		margin: 0 0 0.4em;
+	}
+	.meta {
+		font-size: 0.82em;
+		color: var(--text-muted);
+		margin-bottom: 0.5em;
+	}
+	.updated {
+		margin-left: 1em;
+		font-style: italic;
+	}
+</style>
