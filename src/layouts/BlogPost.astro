@@ -13,9 +13,10 @@ interface Props {
 	updatedDate?: Date;
 	heroImage?: ImageMetadata;
 	category?: string;
+	readingTime?: number;
 }
 
-const { title, description, pubDate, updatedDate, heroImage, category } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, category, readingTime } = Astro.props;
 
 const categoryLabels: Record<string, string> = {
 	diary: 'Diary',
@@ -28,7 +29,7 @@ const categoryLabels: Record<string, string> = {
 
 <html lang="ja">
 	<head>
-		<BaseHead title={title} description={description} />
+		<BaseHead title={title} description={description} ogType="article" />
 	</head>
 	<body>
 		<Header />
@@ -54,6 +55,7 @@ const categoryLabels: Record<string, string> = {
 						pubDate && (
 							<div class="meta">
 								<FormattedDate date={pubDate} />
+								{readingTime && <span class="reading-time">· 約{readingTime}分</span>}
 								{updatedDate && (
 									<span class="updated">
 										（更新: <FormattedDate date={updatedDate} />）
@@ -104,6 +106,9 @@ const categoryLabels: Record<string, string> = {
 		font-size: 0.82em;
 		color: var(--text-muted);
 		margin-bottom: 0.5em;
+	}
+	.reading-time {
+		margin-left: 0.6em;
 	}
 	.updated {
 		margin-left: 1em;

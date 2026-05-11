@@ -4,6 +4,6 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-	site: 'https://example.com',
+	site: 'https://kiyo-field-notes.vercel.app',
 	integrations: [mdx(), sitemap()],
 });

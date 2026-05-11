@@ -14,8 +14,9 @@ type Props = CollectionEntry<'reading'>;
 
 const post = Astro.props;
 const { Content } = await render(post);
+const readingTime = Math.max(1, Math.ceil((post.body?.length ?? 0) / 400));
 ---
 
-<BlogPost {...post.data} category="reading">
+<BlogPost {...post.data} category="reading" readingTime={readingTime}>
 	<Content />
 </BlogPost>
