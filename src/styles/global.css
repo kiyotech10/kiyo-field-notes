@@ -4,12 +4,32 @@
 	--bg: #f9f7f3;
 	--text: #1c1a16;
 	--text-muted: #7a7568;
-	--accent: #1a3a52;
-	--accent-light: #2a5578;
+	--accent: #4a7a5e;
+	--accent-light: #6ba882;
 	--border: #ddd8cf;
 	--max-width: 640px;
 	--font-body: 'Noto Serif JP', 'Georgia', serif;
 	--font-heading: 'EB Garamond', 'Georgia', serif;
+}
+
+[data-theme="dark"] {
+	--bg: #161410;
+	--text: #e8e4dc;
+	--text-muted: #8a8478;
+	--accent: #6ba882;
+	--accent-light: #8fc4a0;
+	--border: #2e2b24;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--bg: #161410;
+		--text: #e8e4dc;
+		--text-muted: #8a8478;
+		--accent: #6ba882;
+		--accent-light: #8fc4a0;
+		--border: #2e2b24;
+	}
 }
 
 *,
@@ -95,13 +115,13 @@ img {
 code {
 	font-size: 0.85em;
 	padding: 2px 6px;
-	background-color: #ece8e0;
+	background-color: var(--border);
 	border-radius: 3px;
 }
 
 pre {
 	padding: 1.5em;
-	background: #ece8e0;
+	background: var(--border);
 	border-radius: 4px;
 	overflow-x: auto;
 }

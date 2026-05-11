@@ -5,8 +5,14 @@ import HeaderLink from './HeaderLink.astro';
 
 <header>
 	<div class="header-inner">
-		<div class="site-title">
-			<a href="/">{SITE_TITLE}</a>
+		<div class="header-top">
+			<div class="site-title">
+				<a href="/">{SITE_TITLE}</a>
+			</div>
+			<button id="theme-toggle" aria-label="ダークモード切り替え">
+				<span class="icon-sun">☀️</span>
+				<span class="icon-moon">🌙</span>
+			</button>
 		</div>
 		<nav>
 			<HeaderLink href="/diary">Diary</HeaderLink>
@@ -18,6 +24,23 @@ import HeaderLink from './HeaderLink.astro';
 		</nav>
 	</div>
 </header>
+
+<script>
+	const html = document.documentElement;
+	const btn = document.getElementById('theme-toggle');
+
+	const saved = localStorage.getItem('theme');
+	const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+	const isDark = saved === 'dark' || (!saved && prefersDark);
+	html.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
+	btn?.addEventListener('click', () => {
+		const current = html.getAttribute('data-theme');
+		const next = current === 'dark' ? 'light' : 'dark';
+		html.setAttribute('data-theme', next);
+		localStorage.setItem('theme', next);
+	});
+</script>
 
 <style>
 	header {
@@ -35,6 +58,11 @@ import HeaderLink from './HeaderLink.astro';
 		flex-direction: column;
 		gap: 0.6rem;
 	}
+	.header-top {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
 	.site-title a {
 		font-family: var(--font-heading);
 		font-size: 1.25em;
@@ -46,6 +74,24 @@ import HeaderLink from './HeaderLink.astro';
 	.site-title a:hover {
 		color: var(--accent);
 	}
+	#theme-toggle {
+		background: none;
+		border: 1px solid var(--border);
+		border-radius: 20px;
+		padding: 4px 10px;
+		cursor: pointer;
+		font-size: 0.85em;
+		color: var(--text-muted);
+		transition: border-color 0.15s;
+		line-height: 1;
+	}
+	#theme-toggle:hover {
+		border-color: var(--accent);
+	}
+	[data-theme="dark"] .icon-sun { display: inline; }
+	[data-theme="dark"] .icon-moon { display: none; }
+	[data-theme="light"] .icon-sun { display: none; }
+	[data-theme="light"] .icon-moon { display: inline; }
 	nav {
 		display: flex;
 		flex-wrap: wrap;
