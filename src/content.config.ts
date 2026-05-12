@@ -31,9 +31,14 @@ const reading = defineCollection({
 	schema: postSchema,
 });
 
+const lifehack = defineCollection({
+	loader: glob({ base: './src/content/lifehack', pattern: '**/*.{md,mdx}' }),
+	schema: postSchema,
+});
+
 const nursing = defineCollection({
 	loader: glob({ base: './src/content/nursing', pattern: '**/*.{md,mdx}' }),
 	schema: postSchema,
 });
 
-export const collections = { diary, english, study, reading, nursing };
+export const collections = { diary, english, study, reading, nursing, lifehack };

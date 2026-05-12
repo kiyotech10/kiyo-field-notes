@@ -1,0 +1,22 @@
+---
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('lifehack');
+	return posts.map((post) => ({
+		params: { slug: post.id },
+		props: post,
+	}));
+}
+
+type Props = CollectionEntry<'lifehack'>;
+
+const post = Astro.props;
+const { Content } = await render(post);
+const readingTime = Math.max(1, Math.ceil((post.body?.length ?? 0) / 400));
+---
+
+<BlogPost {...post.data} category="lifehack" readingTime={readingTime}>
+	<Content />
+</BlogPost>

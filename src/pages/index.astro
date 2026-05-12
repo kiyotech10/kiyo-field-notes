@@ -11,6 +11,7 @@ const categories = [
 	{ id: 'english', label: 'English', desc: '英語学習のメモ' },
 	{ id: 'study', label: 'Study', desc: '試験勉強の記録' },
 	{ id: 'reading', label: 'Reading', desc: '読書メモ' },
+	{ id: 'lifehack', label: 'Lifehack', desc: '日常をラクにする知恵' },
 	{ id: 'nursing', label: 'Nursing', desc: '看護に関する考察' },
 	{ id: 'about', label: 'About', desc: 'プロフィール' },
 ];
@@ -21,6 +22,7 @@ const allPosts = [
 	...(await getCollection('study')).map((p) => ({ ...p, category: 'study' as const })),
 	...(await getCollection('reading')).map((p) => ({ ...p, category: 'reading' as const })),
 	...(await getCollection('nursing')).map((p) => ({ ...p, category: 'nursing' as const })),
+	...(await getCollection('lifehack')).map((p) => ({ ...p, category: 'lifehack' as const })),
 ]
 	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
 	.slice(0, 10);
