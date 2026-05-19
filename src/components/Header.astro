@@ -27,9 +27,9 @@ import HeaderLink from './HeaderLink.astro';
 		z-index: 100;
 	}
 	.header-inner {
-		max-width: calc(var(--max-width) + 4rem);
-		margin: 0 auto;
-		padding: 0 2rem;
+		max-width: calc(var(--max-width) + max(2rem, 8vw));
+		margin-left: 0;
+		padding: 0 max(2rem, 8vw);
 		height: 52px;
 		display: flex;
 		align-items: center;

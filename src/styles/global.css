@@ -36,7 +36,8 @@ body {
 main {
 	width: var(--max-width);
 	max-width: calc(100% - 3rem);
-	margin: 0 auto;
+	margin-left: max(2rem, 8vw);
+	margin-right: auto;
 	padding: 4em 0;
 }
 
