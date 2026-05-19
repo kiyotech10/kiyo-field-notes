@@ -7,16 +7,6 @@ import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
-const categories = [
-	{ id: 'diary', label: 'Diary', desc: '日常の記録' },
-	{ id: 'english', label: 'English', desc: '英語学習のメモ' },
-	{ id: 'study', label: 'Study', desc: '試験勉強の記録' },
-	{ id: 'reading', label: 'Reading', desc: '読書メモ' },
-	{ id: 'lifehack', label: 'Lifehack', desc: '日常をラクにする知恵' },
-	{ id: 'nursing', label: 'Nursing', desc: '看護に関する考察' },
-	{ id: 'about', label: 'About', desc: 'プロフィール' },
-];
-
 const allPosts = [
 	...(await getCollection('diary')).map((p) => ({ ...p, category: 'diary' as const })),
 	...(await getCollection('english')).map((p) => ({ ...p, category: 'english' as const })),
@@ -27,7 +17,7 @@ const allPosts = [
 ].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const featuredPosts = allPosts.filter((p) => p.data.featured).slice(0, 4);
-const recentPosts = allPosts.slice(0, 8);
+const recentPosts = allPosts.slice(0, 10);
 ---
 
 <!doctype html>
@@ -38,77 +28,53 @@ const recentPosts = allPosts.slice(0, 8);
 	<body>
 		<Header />
 		<main>
+
 			<div class="intro">
-				<h1>{SITE_TITLE}</h1>
-				<p class="tagline">{SITE_DESCRIPTION}</p>
-				<p class="ai-note">※ このブログの記事は、アイデアや体験をもとに Claude（AI）が文章を執筆しています。</p>
+				<h1 class="intro-title">{SITE_TITLE}</h1>
+				<p class="intro-desc">{SITE_DESCRIPTION}</p>
 			</div>
 
-			<nav class="category-grid">
-				{
-					categories.map((cat) => (
-						<a href={`/${cat.id}/`} class="category-card">
-							<span class="cat-label">{cat.label}</span>
-							<span class="cat-desc">{cat.desc}</span>
-						</a>
-					))
-				}
-			</nav>
+			{featuredPosts.length > 0 && (
+				<section class="section">
+					<h2 class="section-label">Featured</h2>
+					<div class="featured-grid">
+						{featuredPosts.map((post) => (
+							<a href={`/${post.category}/${post.id}/`} class="featured-card">
+								<div class="card-thumb">
+									<ArticleThumb title={post.data.title} category={post.category} size="large" />
+								</div>
+								<div class="card-body">
+									<span class="card-cat">{post.category}</span>
+									<h3 class="card-title">{post.data.title}</h3>
+									<p class="card-desc">{post.data.description}</p>
+									<time class="card-date"><FormattedDate date={post.data.pubDate} /></time>
+								</div>
+							</a>
+						))}
+					</div>
+				</section>
+			)}
 
-			{
-				featuredPosts.length > 0 && (
-					<>
-						<hr />
-						<section class="featured-section">
-							<h2 class="section-heading">Featured</h2>
-							<div class="featured-grid">
-								{featuredPosts.map((post) => (
-									<a href={`/${post.category}/${post.id}/`} class="featured-card">
-										<div class="card-thumb">
-											<ArticleThumb title={post.data.title} category={post.category} size="large" />
-										</div>
-										<div class="card-body">
-											<span class="card-cat">{post.category}</span>
-											<h3 class="card-title">{post.data.title}</h3>
-											<p class="card-desc">{post.data.description}</p>
-											<time class="card-date">
-												<FormattedDate date={post.data.pubDate} />
-											</time>
-										</div>
-									</a>
-								))}
-							</div>
-						</section>
-					</>
-				)
-			}
+			<section class="section">
+				<h2 class="section-label">Recent</h2>
+				<ul class="post-list">
+					{recentPosts.map((post) => (
+						<li>
+							<a href={`/${post.category}/${post.id}/`} class="post-row">
+								<div class="post-thumb">
+									<ArticleThumb title={post.data.title} category={post.category} />
+								</div>
+								<div class="post-info">
+									<span class="post-cat">{post.category}</span>
+									<span class="post-title">{post.data.title}</span>
+									<time class="post-date"><FormattedDate date={post.data.pubDate} /></time>
+								</div>
+							</a>
+						</li>
+					))}
+				</ul>
+			</section>
 
-			{
-				recentPosts.length > 0 && (
-					<>
-						<hr />
-						<section class="recent-section">
-							<h2 class="section-heading">Recent</h2>
-							<div class="recent-grid">
-								{recentPosts.map((post) => (
-									<a href={`/${post.category}/${post.id}/`} class="recent-card">
-										<div class="card-thumb">
-											<ArticleThumb title={post.data.title} category={post.category} />
-										</div>
-										<div class="card-body">
-											<span class="card-cat">{post.category}</span>
-											<h3 class="card-title">{post.data.title}</h3>
-											<time class="card-date">
-												<FormattedDate date={post.data.pubDate} />
-											</time>
-										</div>
-									</a>
-								))}
-							</div>
-						</section>
-					</>
-				)
-			}
 		</main>
 		<Footer />
 	</body>
@@ -116,78 +82,60 @@ const recentPosts = allPosts.slice(0, 8);
 
 <style>
 	.intro {
-		margin-bottom: 3em;
+		margin-bottom: 4em;
+		padding-bottom: 2.5em;
+		border-bottom: 1px solid var(--border);
 	}
-	.intro h1 {
-		font-size: 2em;
+	.intro-title {
+		font-size: 1.1em;
 		font-weight: 500;
-		letter-spacing: 0.02em;
-		margin: 0 0 0.4em;
-	}
-	.tagline {
-		color: var(--text-muted);
-		font-size: 0.95em;
-		margin: 0 0 0.4em;
-	}
-	.ai-note {
-		display: inline-block;
-		background: #fff3cd;
-		color: #7a5c00;
-		font-size: 0.78em;
-		margin: 0.4em 0 0;
-		padding: 0.3em 0.8em;
-		border-radius: 4px;
-		border-left: 3px solid #f0b429;
-	}
-
-	/* Category grid */
-	.category-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 0.8rem;
-		margin-bottom: 3em;
-	}
-	.category-card {
-		display: flex;
-		flex-direction: column;
-		gap: 0.35em;
-		padding: 1.1em 1.3em;
-		border: 1px solid var(--border);
-		text-decoration: none;
-		color: var(--text);
-		transition: border-color 0.15s, background 0.15s;
-	}
-	.category-card:hover {
-		border-color: var(--accent);
-		background: rgba(26, 58, 82, 0.04);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		margin: 0 0 0.5em;
 		color: var(--text);
 	}
-	.cat-label {
-		font-family: var(--font-heading);
-		font-size: 1.05em;
-		font-weight: 500;
-		letter-spacing: 0.03em;
-		color: var(--accent);
-	}
-	.cat-desc {
-		font-size: 0.78em;
+	.intro-desc {
+		font-size: 0.9em;
 		color: var(--text-muted);
+		margin: 0;
+		line-height: 1.7;
 	}
 
-	.section-heading {
-		font-size: 0.8em;
-		letter-spacing: 0.12em;
+	.section {
+		margin-bottom: 4em;
+	}
+	.section-label {
+		font-size: 0.68em;
+		letter-spacing: 0.16em;
 		text-transform: uppercase;
 		color: var(--text-muted);
 		font-weight: 400;
-		margin: 0 0 1.2em;
+		margin: 0 0 1.6em;
+		border-bottom: 1px solid var(--border);
+		padding-bottom: 0.8em;
 	}
 
-	/* Shared card styles */
+	/* Featured grid */
+	.featured-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 2rem;
+	}
+	.featured-card {
+		display: flex;
+		flex-direction: column;
+		gap: 0.9em;
+		text-decoration: none;
+		color: var(--text);
+	}
+	.featured-card:hover .card-thumb {
+		opacity: 0.85;
+	}
+	.featured-card:hover .card-title {
+		color: var(--accent);
+	}
 	.card-thumb {
-		overflow: hidden;
-		border-radius: 3px;
-		transition: opacity 0.15s;
+		transition: opacity 0.2s;
 	}
 	.card-body {
 		display: flex;
@@ -195,23 +143,24 @@ const recentPosts = allPosts.slice(0, 8);
 		gap: 0.3em;
 	}
 	.card-cat {
-		font-size: 0.65em;
-		letter-spacing: 0.12em;
+		font-size: 0.62em;
+		letter-spacing: 0.14em;
 		text-transform: uppercase;
-		color: var(--text-muted);
+		color: var(--accent);
+		font-weight: 500;
 	}
 	.card-title {
-		font-family: var(--font-heading);
-		font-size: 1em;
+		font-size: 0.95em;
 		font-weight: 500;
+		line-height: 1.5;
 		margin: 0;
-		line-height: 1.45;
-		color: var(--text);
+		letter-spacing: -0.01em;
+		transition: color 0.15s;
 	}
 	.card-desc {
 		font-size: 0.8em;
 		color: var(--text-muted);
-		line-height: 1.6;
+		line-height: 1.65;
 		margin: 0;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
@@ -221,59 +170,71 @@ const recentPosts = allPosts.slice(0, 8);
 	.card-date {
 		font-size: 0.72em;
 		color: var(--text-muted);
-		margin-top: 0.2em;
+		letter-spacing: 0.02em;
 	}
 
-	/* Featured */
-	.featured-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 1.6rem;
+	/* Recent list */
+	.post-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
 	}
-	.featured-card {
-		display: flex;
-		flex-direction: column;
-		gap: 0.8em;
+	.post-list li {
+		border-bottom: 1px solid var(--border);
+	}
+	.post-list li:first-child {
+		border-top: 1px solid var(--border);
+	}
+	.post-row {
+		display: grid;
+		grid-template-columns: 100px 1fr;
+		gap: 1.2em;
+		padding: 1.1em 0;
 		text-decoration: none;
 		color: var(--text);
+		align-items: center;
 	}
-	.featured-card:hover .card-thumb {
-		opacity: 0.88;
-	}
-	.featured-card:hover .card-title {
+	.post-row:hover .post-title {
 		color: var(--accent);
 	}
-
-	/* Recent */
-	.recent-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 1.2rem;
+	.post-row:hover .post-thumb {
+		opacity: 0.85;
 	}
-	.recent-card {
+	.post-thumb {
+		transition: opacity 0.2s;
+	}
+	.post-info {
 		display: flex;
 		flex-direction: column;
-		gap: 0.65em;
-		text-decoration: none;
-		color: var(--text);
+		gap: 0.25em;
 	}
-	.recent-card:hover .card-thumb {
-		opacity: 0.88;
-	}
-	.recent-card:hover .card-title {
+	.post-cat {
+		font-size: 0.6em;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
 		color: var(--accent);
+		font-weight: 500;
 	}
-	.recent-card .card-title {
-		font-size: 0.88em;
+	.post-title {
+		font-size: 0.9em;
+		font-weight: 500;
+		line-height: 1.5;
+		letter-spacing: -0.01em;
+		transition: color 0.15s;
+	}
+	.post-date {
+		font-size: 0.7em;
+		color: var(--text-muted);
+		letter-spacing: 0.02em;
 	}
 
 	@media (max-width: 600px) {
-		.category-grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
-		.featured-grid,
-		.recent-grid {
+		.featured-grid {
 			grid-template-columns: 1fr;
+		}
+		.post-row {
+			grid-template-columns: 80px 1fr;
+			gap: 0.9em;
 		}
 	}
 </style>

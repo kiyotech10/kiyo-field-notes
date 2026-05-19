@@ -6,23 +6,27 @@ interface Props {
 }
 const { title, category, size = 'default' } = Astro.props;
 
-const catLabel: Record<string, string> = {
-	diary: 'Diary',
-	english: 'English',
-	study: 'Study',
-	reading: 'Reading',
-	lifehack: 'Lifehack',
-	nursing: 'Nursing',
+const catMeta: Record<string, { label: string; color: string; bg: string }> = {
+	diary:    { label: 'Diary',     color: '#b06040', bg: '#fdf8f5' },
+	english:  { label: 'English',   color: '#3d6e8a', bg: '#f5f9fc' },
+	study:    { label: 'Study',     color: '#6455a0', bg: '#f8f6fd' },
+	reading:  { label: 'Reading',   color: '#8a7030', bg: '#fdf9f0' },
+	lifehack: { label: 'Lifehack',  color: '#3a7558', bg: '#f4faf7' },
+	nursing:  { label: 'Nursing',   color: '#2e7070', bg: '#f3f9f9' },
 };
+
+const meta = catMeta[category] ?? { label: category, color: '#6b7280', bg: '#f9fafb' };
 ---
 
-<div class={`thumb cat-${category} size-${size}`} aria-hidden="true">
-	<span class="lines">
-		<span></span><span></span><span></span>
-	</span>
-	<div class="inner">
-		<span class="cat-badge">{catLabel[category] ?? category}</span>
+<div
+	class={`thumb size-${size}`}
+	style={`--cat-color:${meta.color};--cat-bg:${meta.bg};`}
+	aria-hidden="true"
+>
+	<div class="thumb-inner">
+		<span class="cat-label">{meta.label}</span>
 		<span class="thumb-title">{title}</span>
+		<span class="thumb-rule"></span>
 	</div>
 </div>
 
@@ -31,68 +35,63 @@ const catLabel: Record<string, string> = {
 		position: relative;
 		overflow: hidden;
 		aspect-ratio: 16 / 9;
-		display: flex;
-		align-items: flex-end;
 		width: 100%;
+		background: var(--cat-bg);
+		border: 1px solid var(--border);
 	}
 	.size-large {
 		aspect-ratio: 4 / 3;
 	}
 
-	/* Category backgrounds */
-	.cat-diary    { background: linear-gradient(145deg, #4a1c1c 0%, #7a3535 60%, #5c2525 100%); }
-	.cat-english  { background: linear-gradient(145deg, #0d2035 0%, #1a4060 60%, #112a45 100%); }
-	.cat-study    { background: linear-gradient(145deg, #21173a 0%, #3d2a65 60%, #2a1d50 100%); }
-	.cat-reading  { background: linear-gradient(145deg, #2e1e08 0%, #5c3d18 60%, #3d2a0d 100%); }
-	.cat-lifehack { background: linear-gradient(145deg, #0f2519 0%, #254d33 60%, #1a3825 100%); }
-	.cat-nursing  { background: linear-gradient(145deg, #082020 0%, #194040 60%, #0f2d2d 100%); }
+	/* thin accent bar at top */
+	.thumb::before {
+		content: '';
+		position: absolute;
+		top: 0; left: 0; right: 0;
+		height: 2px;
+		background: var(--cat-color);
+	}
 
-	/* decorative diagonal lines */
-	.lines {
+	.thumb-inner {
 		position: absolute;
 		inset: 0;
-		opacity: 0.07;
-		pointer-events: none;
-	}
-	.lines span {
-		position: absolute;
-		width: 200%;
-		height: 1px;
-		background: #fff;
-		transform-origin: 0 0;
-	}
-	.lines span:nth-child(1) { top: 30%; transform: rotate(-15deg); }
-	.lines span:nth-child(2) { top: 55%; transform: rotate(-15deg); }
-	.lines span:nth-child(3) { top: 78%; transform: rotate(-15deg); }
-
-	.inner {
-		position: relative;
-		z-index: 1;
-		padding: 1em 1.1em;
-		width: 100%;
-		background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%);
+		padding: 1.3em 1.4em;
 		display: flex;
 		flex-direction: column;
-		gap: 0.4em;
+		justify-content: flex-end;
+		gap: 0.55em;
 	}
-	.cat-badge {
-		font-size: 0.6em;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: rgba(255,255,255,0.6);
+
+	.cat-label {
 		font-family: var(--font-heading);
+		font-size: 0.6em;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--cat-color);
+		font-weight: 500;
 	}
+
 	.thumb-title {
 		font-family: var(--font-heading);
-		font-size: 0.88em;
-		color: rgba(255,255,255,0.92);
-		line-height: 1.45;
+		font-size: 0.85em;
+		font-weight: 500;
+		color: var(--text);
+		line-height: 1.5;
+		letter-spacing: -0.01em;
 		display: -webkit-box;
 		-webkit-line-clamp: 3;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 	}
 	.size-large .thumb-title {
-		font-size: 1.1em;
+		font-size: 1.05em;
+	}
+
+	.thumb-rule {
+		display: block;
+		width: 24px;
+		height: 1px;
+		background: var(--cat-color);
+		opacity: 0.5;
 	}
 </style>
