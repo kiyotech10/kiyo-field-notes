@@ -40,6 +40,12 @@
       <!-- メインアプリ（データ読み込み後に表示） -->
       <div id="app" hidden>
 
+        <!-- 読み込み済みファイル -->
+        <div id="files-section" class="files-section">
+          <span class="files-label">読み込み済みファイル</span>
+          <div id="files-list" class="files-list"></div>
+        </div>
+
         <!-- 月ナビゲーション -->
         <div class="month-nav">
           <button class="month-btn" id="prev-month">&#8592;</button>
@@ -233,6 +239,71 @@
   .empty-card h2 { font-size: 1.2rem; margin: 0 0 0.8rem; }
   .empty-card p { color: var(--text-muted); font-size: 0.9rem; margin: 0 0 1.5rem; }
   .empty-note { font-size: 0.78rem; color: var(--text-muted); margin-top: 1.2rem; }
+
+  /* ---- Files Section ---- */
+  .files-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.2rem;
+    padding: 0.8rem 1rem;
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+  .files-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    padding-top: 0.2rem;
+  }
+  .files-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex: 1;
+  }
+  .file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 0.25em 0.5em 0.25em 0.8em;
+    font-size: 0.8rem;
+    max-width: 280px;
+  }
+  .file-chip-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 160px;
+    color: var(--text);
+  }
+  .file-chip-meta {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+  .file-chip-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0 0.2em;
+    border-radius: 50%;
+    transition: color 0.15s, background 0.15s;
+  }
+  .file-chip-del:hover {
+    color: #dc2626;
+    background: #fee2e2;
+  }
 
   /* ---- Month Nav ---- */
   .month-nav {
@@ -504,12 +575,20 @@
     store: string;
     amount: number;
     category: string;
+    source: string;
+  }
+
+  interface ImportedFile {
+    name: string;
+    count: number;
+    importedAt: string;
   }
 
   // ----------------------------------------------------------------
   // アプリ状態
   // ----------------------------------------------------------------
   let transactions: Transaction[] = [];
+  let importedFiles: ImportedFile[] = [];
   let budgets: Record<string, number> = {};
   let selectedMonth = formatMonth(new Date());
 
@@ -519,22 +598,26 @@
   // ----------------------------------------------------------------
   // LocalStorage
   // ----------------------------------------------------------------
-  const LS_TX  = 'paypay_transactions';
-  const LS_BUD = 'paypay_budgets';
+  const LS_TX    = 'paypay_transactions';
+  const LS_BUD   = 'paypay_budgets';
+  const LS_FILES = 'paypay_files';
 
   function saveData() {
-    localStorage.setItem(LS_TX,  JSON.stringify(transactions.map(t => ({ ...t, date: t.date.toISOString() }))));
-    localStorage.setItem(LS_BUD, JSON.stringify(budgets));
+    localStorage.setItem(LS_TX,    JSON.stringify(transactions.map(t => ({ ...t, date: t.date.toISOString() }))));
+    localStorage.setItem(LS_BUD,   JSON.stringify(budgets));
+    localStorage.setItem(LS_FILES, JSON.stringify(importedFiles));
   }
 
   function loadData() {
     const txRaw = localStorage.getItem(LS_TX);
     if (txRaw) {
       const parsed = JSON.parse(txRaw) as Array<Transaction & { date: string }>;
-      transactions = parsed.map(t => ({ ...t, date: new Date(t.date) }));
+      transactions = parsed.map(t => ({ ...t, date: new Date(t.date), source: t.source ?? '' }));
     }
     const budRaw = localStorage.getItem(LS_BUD);
     if (budRaw) budgets = JSON.parse(budRaw);
+    const filesRaw = localStorage.getItem(LS_FILES);
+    if (filesRaw) importedFiles = JSON.parse(filesRaw);
   }
 
   // ----------------------------------------------------------------
@@ -585,7 +668,7 @@
     return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
   }
 
-  function parseCSV(text: string): Transaction[] {
+  function parseCSV(text: string, filename = ''): Transaction[] {
     const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
     if (lines.length < 2) return [];
 
@@ -624,15 +707,16 @@
           store,
           amount: Math.abs(expAmt),
           category: detectCategory(store),
+          source: filename,
         });
       } else if (expAmt > 0 && chrAmt === 0 && chargeCol >= 0) {
-        // 支出列が正の場合（一部フォーマット）
         result.push({
           id: `${date.toISOString()}_${i}`,
           date,
           store,
           amount: expAmt,
           category: detectCategory(store),
+          source: filename,
         });
       }
       // チャージはスキップ
@@ -919,11 +1003,48 @@
     renderMonthlyChart();
   }
 
+  function deleteFile(filename: string) {
+    if (!confirm(`「${filename}」のデータを削除しますか？`)) return;
+    transactions = transactions.filter(t => t.source !== filename);
+    importedFiles = importedFiles.filter(f => f.name !== filename);
+    if (transactions.length > 0) {
+      selectedMonth = formatMonth(transactions[0].date);
+    }
+    saveData();
+    if (transactions.length === 0) { hideApp(); return; }
+    renderAll();
+  }
+
+  function renderFiles() {
+    const container = document.getElementById('files-list') as HTMLElement;
+    if (!container) return;
+    container.innerHTML = '';
+    if (importedFiles.length === 0) return;
+
+    for (const f of importedFiles) {
+      const d = new Date(f.importedAt);
+      const dateStr = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      const chip = document.createElement('div');
+      chip.className = 'file-chip';
+      chip.innerHTML = `
+        <span class="file-chip-name" title="${f.name}">${f.name}</span>
+        <span class="file-chip-meta">${f.count}件 · ${dateStr}</span>
+        <button class="file-chip-del" data-name="${f.name}" title="削除">×</button>
+      `;
+      container.appendChild(chip);
+    }
+
+    container.querySelectorAll('.file-chip-del').forEach(btn => {
+      btn.addEventListener('click', () => deleteFile((btn as HTMLElement).dataset.name!));
+    });
+  }
+
   function renderAll() {
     renderStats();
     renderCharts();
     renderBudget();
     renderCategoryFilter();
+    renderFiles();
     renderTransactions(
       (document.getElementById('search-input') as HTMLInputElement).value,
       (document.getElementById('category-filter') as HTMLSelectElement).value,
@@ -959,7 +1080,7 @@
         text = new TextDecoder('shift-jis').decode(buf);
       }
 
-      const parsed = parseCSV(text);
+      const parsed = parseCSV(text, file.name);
       if (parsed.length === 0) {
         alert('取引データが見つかりませんでした。\nPayPayアプリからエクスポートしたCSVを確認してください。');
         return;
@@ -970,14 +1091,16 @@
       const newTxs = parsed.filter(t => !existingIds.has(t.id));
       transactions = [...transactions, ...newTxs].sort((a, b) => b.date.getTime() - a.date.getTime());
 
+      // ファイル履歴に追加（同名ファイルは上書き）
+      importedFiles = importedFiles.filter(f => f.name !== file.name);
+      importedFiles.unshift({ name: file.name, count: parsed.length, importedAt: new Date().toISOString() });
+
       // 最新月を選択
       if (transactions.length > 0) selectedMonth = formatMonth(transactions[0].date);
 
       saveData();
       showApp();
       renderAll();
-
-      alert(`${parsed.length}件を読み込みました（新規 ${newTxs.length}件）。`);
     };
   }
 
