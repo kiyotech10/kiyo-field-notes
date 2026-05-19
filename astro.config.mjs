@@ -5,5 +5,5 @@ import { defineConfig } from 'astro/config';
 
 export default defineConfig({
 	site: 'https://kiyo-field-notes.vercel.app',
-	integrations: [mdx()],
+	integrations: [mdx(), sitemap()],
 });
