@@ -474,19 +474,21 @@
   // ----------------------------------------------------------------
   const CATEGORIES = [
     { id: 'food',         label: '食費',      color: '#f97316',
-      keywords: ['スーパー','イオン','ライフ','西友','マルエツ','ヨーカドー','業務スーパー','コストコ','食品','弁当','惣菜','レストラン','ファミレス','ガスト','デニーズ','ジョナサン','すき家','吉野家','松屋','なか卯','ケンタッキー','マクドナルド','モスバーガー','バーガー','ピザ','寿司','焼肉','ラーメン','うどん','そば','定食','居酒屋'] },
+      keywords: ['スーパー','イオン','ライフ','西友','マルエツ','ヨーカドー','業務スーパー','コストコ','食品','弁当','惣菜','タイラヤ','TAIRAYA','レストラン','ファミレス','ガスト','デニーズ','ジョナサン','サイゼリヤ','すき家','吉野家','松屋','なか卯','ケンタッキー','マクドナルド','モスバーガー','バーガー','ピザ','寿司','焼肉','ラーメン','丸亀製麺','うどん','そば','定食','居酒屋','かつ','とんかつ','矢田','和國','HANAGATAYA','はなが','NewDays','ニューデイズ','エキュート','菓子','茶','和菓子'] },
     { id: 'convenience',  label: 'コンビニ',  color: '#eab308',
-      keywords: ['セブン-イレブン','セブンイレブン','ファミリーマート','ファミマ','ローソン','ミニストップ','デイリーヤマザキ','ポプラ','コンビニ'] },
+      keywords: ['セブン-イレブン','セブンイレブン','7-eleven','ファミリーマート','ファミマ','ローソン','ミニストップ','デイリーヤマザキ','ポプラ','コンビニ'] },
     { id: 'cafe',         label: 'カフェ',    color: '#a16207',
-      keywords: ['スターバックス','スタバ','ドトール','コメダ','タリーズ','ベローチェ','エクセルシオール','サンマルク','カフェ','CAFÉ','COFFEE','珈琲'] },
+      keywords: ['スターバックス','スタバ','ドトール','コメダ','タリーズ','ベローチェ','エクセルシオール','サンマルク','カフェ','café','coffee','珈琲','CHIENOWA'] },
     { id: 'transport',    label: '交通費',    color: '#0ea5e9',
-      keywords: ['スイカ','Suica','PASMO','パスモ','電車','バス','タクシー','地下鉄','JR','東急','小田急','京急','西武','東武','メトロ','ガソリン','ENEOS','出光','コスモ','駐車場','駐輪場'] },
+      keywords: ['suica','pasmo','パスモ','モバイルpasmo','電車','バス','タクシー','地下鉄','JR','jr','東急','小田急','京急','西武鉄道','西武','東武','メトロ','ガソリン','eneos','出光','コスモ','駐車場','駐輪場','タイムズ','times','カーシェア','タイムズカー'] },
     { id: 'medical',      label: '医療・健康', color: '#6366f1',
-      keywords: ['病院','クリニック','薬局','ドラッグ','マツキヨ','マツモトキヨシ','ウエルシア','ツルハ','コクミン','サンドラッグ','スギ薬局','調剤','整骨','歯科','眼科','内科'] },
+      keywords: ['病院','クリニック','薬局','ドラッグ','マツキヨ','マツモトキヨシ','ウエルシア','ツルハ','コクミン','サンドラッグ','スギ薬局','調剤','整骨','歯科','眼科','内科','スポーツデポ','スポーツ'] },
+    { id: 'telecom',      label: '通信・サービス', color: '#14b8a6',
+      keywords: ['楽天モバイル','docomo','ドコモ','au','softbank','ソフトバンク','マイクロソフト','microsoft','bb.excite','excite','google','apple','アップル','ntt','line','spotify','netflix','amazon prime','amazonプライム','プライム会費','claude','anthropic'] },
     { id: 'entertainment',label: '娯楽',      color: '#ec4899',
-      keywords: ['映画','シネマ','ゲーム','カラオケ','温泉','銭湯','ジム','スポーツ','ゴルフ','ボウリング','ディズニー','ユニバ','遊園地','水族館','動物園','美術館','博物館'] },
+      keywords: ['映画','シネマ','ゲーム','カラオケ','温泉','銭湯','ジム','ゴルフ','ボウリング','ディズニー','ユニバ','遊園地','水族館','動物園','美術館','博物館'] },
     { id: 'shopping',     label: 'ショッピング',color: '#8b5cf6',
-      keywords: ['ユニクロ','GU','しまむら','ZARA','H&M','無印','ムジ','ニトリ','ヤマダ','ビックカメラ','ヨドバシ','ドンキ','Amazon','楽天','メルカリ','百貨店','デパート','アウトレット'] },
+      keywords: ['ユニクロ','gu','しまむら','zara','h&m','無印','ムジ','ニトリ','ヤマダ','ビックカメラ','ヨドバシ','ドン・キホーテ','ドンキ','amazon','楽天','メルカリ','メルポーチ','百貨店','デパート','アウトレット','ダイソー','daiso','セリア','キャンドゥ','ビバホーム','ホームセンター','コーナン'] },
     { id: 'other',        label: 'その他',    color: '#94a3b8', keywords: [] },
   ];
 
@@ -558,10 +560,11 @@
   }
 
   function findColIndex(headers: string[], candidates: string[]): number {
-    for (const h of headers) {
-      const normalized = h.replace(/[（）()　\s]/g, '').toLowerCase();
-      for (const c of candidates) {
-        if (normalized.includes(c.toLowerCase())) return headers.indexOf(h);
+    // candidates の順番を優先（先に書いたものが優先される）
+    for (const c of candidates) {
+      for (let i = 0; i < headers.length; i++) {
+        const normalized = headers[i].replace(/[（）()　\s]/g, '').toLowerCase();
+        if (normalized.includes(c.toLowerCase())) return i;
       }
     }
     return -1;
@@ -589,7 +592,7 @@
     const headers = parseCSVRow(lines[0]).map(h => h.replace(/[""]/g, '').trim());
 
     const dateCol    = findColIndex(headers, ['利用日', '取引日', '日付', '年月日']);
-    const storeCol   = findColIndex(headers, ['利用先', '取引内容', '店舗', '摘要', '相手先']);
+    const storeCol   = findColIndex(headers, ['利用先', '取引先', '店舗', '摘要', '相手先', '取引内容']);
     const expenseCol = findColIndex(headers, ['利用金額', '支払金額', '出金', '金額']);
     const chargeCol  = findColIndex(headers, ['チャージ金額', 'チャージ', '入金']);
 
@@ -642,10 +645,12 @@
   // カテゴリ自動判定
   // ----------------------------------------------------------------
   function detectCategory(store: string): string {
+    // 全角→半角正規化＋小文字化して照合
+    const norm = store.normalize('NFKC').toLowerCase();
     for (const cat of CATEGORIES) {
       if (cat.id === 'other') continue;
       for (const kw of cat.keywords) {
-        if (store.includes(kw)) return cat.id;
+        if (norm.includes(kw.normalize('NFKC').toLowerCase())) return cat.id;
       }
     }
     return 'other';
