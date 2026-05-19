@@ -1,0 +1,1038 @@
+---
+// PayPay 家計管理アプリ — 完全クライアントサイド
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PayPay 家計管理</title>
+  </head>
+  <body>
+
+    <header class="app-header">
+      <div class="header-inner">
+        <h1 class="app-title">PayPay 家計管理</h1>
+        <div class="header-actions">
+          <label class="btn btn-primary" for="csv-input" title="PayPayアプリからエクスポートしたCSVを読み込む">
+            <span>＋ CSV読み込み</span>
+          </label>
+          <input type="file" id="csv-input" accept=".csv" style="display:none" />
+          <button class="btn btn-ghost" id="reset-btn" style="display:none">リセット</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- 空状態 -->
+      <div id="empty-state">
+        <div class="empty-card">
+          <div class="empty-icon">📊</div>
+          <h2>PayPayの利用データを読み込んでください</h2>
+          <p>PayPayアプリ → 「残高」→「利用履歴」→「CSVダウンロード」でエクスポートしたファイルを使用できます。</p>
+          <label class="btn btn-primary btn-lg" for="csv-input">CSVファイルを選択</label>
+          <p class="empty-note">データはお使いのブラウザ内にのみ保存されます。外部送信は一切しません。</p>
+        </div>
+      </div>
+
+      <!-- メインアプリ（データ読み込み後に表示） -->
+      <div id="app" hidden>
+
+        <!-- 月ナビゲーション -->
+        <div class="month-nav">
+          <button class="month-btn" id="prev-month">&#8592;</button>
+          <span class="month-label" id="month-label">2026年5月</span>
+          <button class="month-btn" id="next-month">&#8594;</button>
+        </div>
+
+        <!-- サマリーカード -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">今月の支出</div>
+            <div class="stat-value expense-value" id="stat-total">¥0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">取引件数</div>
+            <div class="stat-value" id="stat-count">0件</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">1件あたり平均</div>
+            <div class="stat-value" id="stat-avg">¥0</div>
+          </div>
+        </div>
+
+        <!-- グラフエリア -->
+        <div class="charts-grid">
+          <div class="card">
+            <h2 class="card-title">カテゴリ別内訳</h2>
+            <div class="chart-wrap">
+              <canvas id="chart-category"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <h2 class="card-title">月別支出推移</h2>
+            <div class="chart-wrap">
+              <canvas id="chart-monthly"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- 予算管理 -->
+        <div class="card" id="budget-section">
+          <div class="section-header">
+            <h2 class="card-title">予算管理</h2>
+            <span class="section-note">月ごとの予算上限を設定できます</span>
+          </div>
+          <div id="budget-list" class="budget-list"></div>
+        </div>
+
+        <!-- 取引履歴 -->
+        <div class="card" id="transactions-section">
+          <div class="section-header">
+            <h2 class="card-title">取引履歴</h2>
+            <div class="filter-bar">
+              <input type="search" id="search-input" class="search-input" placeholder="店舗名で検索..." />
+              <select id="category-filter" class="select-input">
+                <option value="">すべてのカテゴリ</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table id="transactions-table" class="tx-table">
+              <thead>
+                <tr>
+                  <th>日付</th>
+                  <th>店舗名</th>
+                  <th class="th-amount">金額</th>
+                  <th>カテゴリ</th>
+                </tr>
+              </thead>
+              <tbody id="transactions-body"></tbody>
+            </table>
+          </div>
+          <div id="no-results" class="no-results" hidden>該当する取引が見つかりません</div>
+        </div>
+
+      </div>
+    </main>
+
+  </body>
+</html>
+
+<style>
+  :root {
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --border: #e2e8f0;
+    --expense: #dc2626;
+    --success: #16a34a;
+    --warning: #d97706;
+    --max-width: 1100px;
+    --radius: 10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ---- Header ---- */
+  .app-header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0.9rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .app-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  /* ---- Buttons ---- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.45em 1.1em;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--bg); }
+  .btn-lg { padding: 0.7em 2em; font-size: 1rem; }
+
+  /* ---- Main layout ---- */
+  main {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+
+  /* ---- Empty State ---- */
+  #empty-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+  }
+  .empty-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 3rem 2rem;
+    text-align: center;
+    max-width: 480px;
+    width: 100%;
+    border: 2px dashed var(--border);
+  }
+  .empty-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+  .empty-card h2 { font-size: 1.2rem; margin: 0 0 0.8rem; }
+  .empty-card p { color: var(--text-muted); font-size: 0.9rem; margin: 0 0 1.5rem; }
+  .empty-note { font-size: 0.78rem; color: var(--text-muted); margin-top: 1.2rem; }
+
+  /* ---- Month Nav ---- */
+  .month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+  }
+  .month-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 2rem;
+    height: 2rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s;
+  }
+  .month-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .month-label { font-size: 1.1rem; font-weight: 700; min-width: 8rem; text-align: center; }
+
+  /* ---- Stats Grid ---- */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .stat-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 1.2rem 1.5rem;
+    border: 1px solid var(--border);
+  }
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.03em;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+  }
+  .stat-value { font-size: 1.7rem; font-weight: 700; letter-spacing: -0.02em; }
+  .expense-value { color: var(--expense); }
+
+  /* ---- Cards ---- */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .card-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin: 0 0 1.2rem;
+  }
+
+  /* ---- Charts Grid ---- */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .chart-wrap {
+    position: relative;
+    height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .chart-wrap canvas { max-height: 240px; }
+
+  /* ---- Budget ---- */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .section-note { font-size: 0.8rem; color: var(--text-muted); }
+  .budget-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+  .budget-item { padding: 0; }
+  .budget-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+  }
+  .budget-cat-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .cat-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .budget-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .budget-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.3em 0.6em;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: var(--bg);
+  }
+  .budget-input:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+  .budget-progress {
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .budget-bar {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.3s;
+  }
+  .budget-status {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+  }
+  .budget-over { color: var(--expense); font-weight: 600; }
+
+  /* ---- Transactions ---- */
+  .filter-bar {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .search-input, .select-input {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.35em 0.7em;
+    font-size: 0.88rem;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .search-input { min-width: 180px; }
+  .search-input:focus, .select-input:focus { outline: 2px solid var(--accent); }
+  .table-wrap { overflow-x: auto; }
+  .tx-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  .tx-table th {
+    text-align: left;
+    padding: 0.55em 0.8em;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border);
+  }
+  .th-amount { text-align: right; }
+  .tx-table td {
+    padding: 0.7em 0.8em;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .tx-table tr:last-child td { border-bottom: none; }
+  .tx-table tr:hover td { background: var(--bg); }
+  .td-date { color: var(--text-muted); white-space: nowrap; font-size: 0.83rem; }
+  .td-store { font-weight: 500; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .td-amount { text-align: right; font-weight: 700; color: var(--expense); white-space: nowrap; }
+  .td-cat select {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.2em 0.5em;
+    font-size: 0.82rem;
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .cat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    font-size: 0.8rem;
+    padding: 0.15em 0.6em;
+    border-radius: 99px;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .no-results {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2rem;
+    font-size: 0.9rem;
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 768px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .stats-grid .stat-card:last-child { grid-column: span 2; }
+    .charts-grid { grid-template-columns: 1fr; }
+    .stat-value { font-size: 1.35rem; }
+    main { padding: 1rem; }
+  }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .stats-grid .stat-card:last-child { grid-column: auto; }
+    .header-inner { padding: 0.7rem 1rem; }
+    .app-title { font-size: 1rem; }
+  }
+</style>
+
+<script>
+  import Chart from 'chart.js/auto';
+
+  // ----------------------------------------------------------------
+  // カテゴリ定義
+  // ----------------------------------------------------------------
+  const CATEGORIES = [
+    { id: 'food',         label: '食費',      color: '#f97316',
+      keywords: ['スーパー','イオン','ライフ','西友','マルエツ','ヨーカドー','業務スーパー','コストコ','食品','弁当','惣菜','レストラン','ファミレス','ガスト','デニーズ','ジョナサン','すき家','吉野家','松屋','なか卯','ケンタッキー','マクドナルド','モスバーガー','バーガー','ピザ','寿司','焼肉','ラーメン','うどん','そば','定食','居酒屋'] },
+    { id: 'convenience',  label: 'コンビニ',  color: '#eab308',
+      keywords: ['セブン-イレブン','セブンイレブン','ファミリーマート','ファミマ','ローソン','ミニストップ','デイリーヤマザキ','ポプラ','コンビニ'] },
+    { id: 'cafe',         label: 'カフェ',    color: '#a16207',
+      keywords: ['スターバックス','スタバ','ドトール','コメダ','タリーズ','ベローチェ','エクセルシオール','サンマルク','カフェ','CAFÉ','COFFEE','珈琲'] },
+    { id: 'transport',    label: '交通費',    color: '#0ea5e9',
+      keywords: ['スイカ','Suica','PASMO','パスモ','電車','バス','タクシー','地下鉄','JR','東急','小田急','京急','西武','東武','メトロ','ガソリン','ENEOS','出光','コスモ','駐車場','駐輪場'] },
+    { id: 'medical',      label: '医療・健康', color: '#6366f1',
+      keywords: ['病院','クリニック','薬局','ドラッグ','マツキヨ','マツモトキヨシ','ウエルシア','ツルハ','コクミン','サンドラッグ','スギ薬局','調剤','整骨','歯科','眼科','内科'] },
+    { id: 'entertainment',label: '娯楽',      color: '#ec4899',
+      keywords: ['映画','シネマ','ゲーム','カラオケ','温泉','銭湯','ジム','スポーツ','ゴルフ','ボウリング','ディズニー','ユニバ','遊園地','水族館','動物園','美術館','博物館'] },
+    { id: 'shopping',     label: 'ショッピング',color: '#8b5cf6',
+      keywords: ['ユニクロ','GU','しまむら','ZARA','H&M','無印','ムジ','ニトリ','ヤマダ','ビックカメラ','ヨドバシ','ドンキ','Amazon','楽天','メルカリ','百貨店','デパート','アウトレット'] },
+    { id: 'other',        label: 'その他',    color: '#94a3b8', keywords: [] },
+  ];
+
+  const CATEGORY_MAP: Record<string, (typeof CATEGORIES)[0]> = {};
+  for (const cat of CATEGORIES) CATEGORY_MAP[cat.id] = cat;
+
+  // ----------------------------------------------------------------
+  // 型定義
+  // ----------------------------------------------------------------
+  interface Transaction {
+    id: string;
+    date: Date;
+    store: string;
+    amount: number;
+    category: string;
+  }
+
+  // ----------------------------------------------------------------
+  // アプリ状態
+  // ----------------------------------------------------------------
+  let transactions: Transaction[] = [];
+  let budgets: Record<string, number> = {};
+  let selectedMonth = formatMonth(new Date());
+
+  let categoryChart: Chart | null = null;
+  let monthlyChart: Chart | null = null;
+
+  // ----------------------------------------------------------------
+  // LocalStorage
+  // ----------------------------------------------------------------
+  const LS_TX  = 'paypay_transactions';
+  const LS_BUD = 'paypay_budgets';
+
+  function saveData() {
+    localStorage.setItem(LS_TX,  JSON.stringify(transactions.map(t => ({ ...t, date: t.date.toISOString() }))));
+    localStorage.setItem(LS_BUD, JSON.stringify(budgets));
+  }
+
+  function loadData() {
+    const txRaw = localStorage.getItem(LS_TX);
+    if (txRaw) {
+      const parsed = JSON.parse(txRaw) as Array<Transaction & { date: string }>;
+      transactions = parsed.map(t => ({ ...t, date: new Date(t.date) }));
+    }
+    const budRaw = localStorage.getItem(LS_BUD);
+    if (budRaw) budgets = JSON.parse(budRaw);
+  }
+
+  // ----------------------------------------------------------------
+  // CSV パーサー
+  // ----------------------------------------------------------------
+  function parseCSVRow(line: string): string[] {
+    const result: string[] = [];
+    let cur = '';
+    let inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') {
+        if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if (c === ',' && !inQ) {
+        result.push(cur.trim()); cur = '';
+      } else {
+        cur += c;
+      }
+    }
+    result.push(cur.trim());
+    return result;
+  }
+
+  function findColIndex(headers: string[], candidates: string[]): number {
+    for (const h of headers) {
+      const normalized = h.replace(/[（）()　\s]/g, '').toLowerCase();
+      for (const c of candidates) {
+        if (normalized.includes(c.toLowerCase())) return headers.indexOf(h);
+      }
+    }
+    return -1;
+  }
+
+  function parseAmount(s: string): number {
+    if (!s) return 0;
+    const cleaned = s.replace(/[,，¥￥\s"]/g, '');
+    const n = parseFloat(cleaned);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function parseDate(s: string): Date | null {
+    const cleaned = s.replace(/[""]/g, '').trim();
+    // YYYY/MM/DD HH:MM:SS or YYYY/MM/DD or YYYY-MM-DD
+    const m = cleaned.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+    if (!m) return null;
+    return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
+  }
+
+  function parseCSV(text: string): Transaction[] {
+    const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 2) return [];
+
+    const headers = parseCSVRow(lines[0]).map(h => h.replace(/[""]/g, '').trim());
+
+    const dateCol    = findColIndex(headers, ['利用日', '取引日', '日付', '年月日']);
+    const storeCol   = findColIndex(headers, ['利用先', '取引内容', '店舗', '摘要', '相手先']);
+    const expenseCol = findColIndex(headers, ['利用金額', '支払金額', '出金', '金額']);
+    const chargeCol  = findColIndex(headers, ['チャージ金額', 'チャージ', '入金']);
+
+    if (dateCol < 0) {
+      alert('CSVの形式を認識できませんでした。PayPayアプリからエクスポートしたCSVを使用してください。');
+      return [];
+    }
+
+    const result: Transaction[] = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const cols = parseCSVRow(lines[i]);
+      const dateStr   = cols[dateCol]    ?? '';
+      const store     = (storeCol >= 0   ? cols[storeCol]   ?? '' : '').replace(/[""]/g, '').trim();
+      const expenseStr= expenseCol >= 0  ? cols[expenseCol] ?? '' : '';
+      const chargeStr = chargeCol >= 0   ? cols[chargeCol]  ?? '' : '';
+
+      const date = parseDate(dateStr);
+      if (!date) continue;
+
+      const expAmt = parseAmount(expenseStr);
+      const chrAmt = parseAmount(chargeStr);
+
+      // 支出（マイナス値、または支出列が正値で入金列が空）
+      if (expAmt < 0) {
+        result.push({
+          id: `${date.toISOString()}_${i}`,
+          date,
+          store,
+          amount: Math.abs(expAmt),
+          category: detectCategory(store),
+        });
+      } else if (expAmt > 0 && chrAmt === 0 && chargeCol >= 0) {
+        // 支出列が正の場合（一部フォーマット）
+        result.push({
+          id: `${date.toISOString()}_${i}`,
+          date,
+          store,
+          amount: expAmt,
+          category: detectCategory(store),
+        });
+      }
+      // チャージはスキップ
+    }
+
+    return result.sort((a, b) => b.date.getTime() - a.date.getTime());
+  }
+
+  // ----------------------------------------------------------------
+  // カテゴリ自動判定
+  // ----------------------------------------------------------------
+  function detectCategory(store: string): string {
+    for (const cat of CATEGORIES) {
+      if (cat.id === 'other') continue;
+      for (const kw of cat.keywords) {
+        if (store.includes(kw)) return cat.id;
+      }
+    }
+    return 'other';
+  }
+
+  // ----------------------------------------------------------------
+  // ユーティリティ
+  // ----------------------------------------------------------------
+  function formatMonth(d: Date): string {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  function formatYen(n: number): string {
+    return '¥' + Math.round(n).toLocaleString('ja-JP');
+  }
+
+  function formatDateJP(d: Date): string {
+    return `${d.getMonth() + 1}/${d.getDate()}`;
+  }
+
+  function txInMonth(tx: Transaction, ym: string): boolean {
+    return formatMonth(tx.date) === ym;
+  }
+
+  // ----------------------------------------------------------------
+  // データ集計
+  // ----------------------------------------------------------------
+  function monthlyTotal(ym: string): number {
+    return transactions.filter(t => txInMonth(t, ym)).reduce((s, t) => s + t.amount, 0);
+  }
+
+  function categoryTotals(ym: string): Record<string, number> {
+    const totals: Record<string, number> = {};
+    for (const cat of CATEGORIES) totals[cat.id] = 0;
+    for (const t of transactions) {
+      if (txInMonth(t, ym)) totals[t.category] = (totals[t.category] ?? 0) + t.amount;
+    }
+    return totals;
+  }
+
+  function last6Months(): string[] {
+    const months: string[] = [];
+    const d = new Date(selectedMonth + '-01');
+    for (let i = 5; i >= 0; i--) {
+      const m = new Date(d.getFullYear(), d.getMonth() - i, 1);
+      months.push(formatMonth(m));
+    }
+    return months;
+  }
+
+  // ----------------------------------------------------------------
+  // グラフ描画
+  // ----------------------------------------------------------------
+  function renderCategoryChart() {
+    const totals = categoryTotals(selectedMonth);
+    const cats = CATEGORIES.filter(c => totals[c.id] > 0);
+    if (cats.length === 0) { destroyChart('category-chart'); return; }
+
+    const canvas = document.getElementById('chart-category') as HTMLCanvasElement;
+    if (categoryChart) categoryChart.destroy();
+    categoryChart = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: cats.map(c => c.label),
+        datasets: [{
+          data: cats.map(c => totals[c.id]),
+          backgroundColor: cats.map(c => c.color),
+          borderWidth: 2,
+          borderColor: '#fff',
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'right', labels: { font: { size: 11 }, boxWidth: 12, padding: 10 } },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${formatYen(ctx.parsed)} (${Math.round(ctx.parsed / cats.reduce((s,c)=>s+totals[c.id],0)*100)}%)`,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function renderMonthlyChart() {
+    const months = last6Months();
+    const canvas = document.getElementById('chart-monthly') as HTMLCanvasElement;
+    if (monthlyChart) monthlyChart.destroy();
+    monthlyChart = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: months.map(m => { const [y, mo] = m.split('-'); return `${mo}月`; }),
+        datasets: [{
+          label: '支出',
+          data: months.map(m => monthlyTotal(m)),
+          backgroundColor: months.map(m => m === selectedMonth ? '#2563eb' : '#bfdbfe'),
+          borderRadius: 5,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: { label: ctx => ' ' + formatYen(ctx.parsed.y) },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { callback: v => '¥' + Number(v).toLocaleString('ja-JP'), font: { size: 10 } },
+            grid: { color: '#f1f5f9' },
+          },
+          x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+        },
+      },
+    });
+  }
+
+  function destroyChart(id: string) {
+    const canvas = document.getElementById(id) as HTMLCanvasElement;
+    if (canvas) { const ctx = canvas.getContext('2d'); if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); }
+  }
+
+  // ----------------------------------------------------------------
+  // UI 更新
+  // ----------------------------------------------------------------
+  function renderStats() {
+    const txs = transactions.filter(t => txInMonth(t, selectedMonth));
+    const total = txs.reduce((s, t) => s + t.amount, 0);
+    const count = txs.length;
+    const avg = count > 0 ? total / count : 0;
+
+    (document.getElementById('stat-total') as HTMLElement).textContent = formatYen(total);
+    (document.getElementById('stat-count') as HTMLElement).textContent = count + '件';
+    (document.getElementById('stat-avg') as HTMLElement).textContent = count > 0 ? formatYen(avg) : '-';
+
+    // 月ラベル
+    const [y, m] = selectedMonth.split('-');
+    (document.getElementById('month-label') as HTMLElement).textContent = `${y}年${parseInt(m)}月`;
+  }
+
+  function renderBudget() {
+    const totals = categoryTotals(selectedMonth);
+    const container = document.getElementById('budget-list') as HTMLElement;
+    container.innerHTML = '';
+
+    for (const cat of CATEGORIES) {
+      if (cat.id === 'other') continue;
+      const spent = totals[cat.id] ?? 0;
+      const budget = budgets[cat.id] ?? 0;
+      const pct = budget > 0 ? Math.min(100, (spent / budget) * 100) : 0;
+      const isOver = budget > 0 && spent > budget;
+      const barColor = isOver ? '#dc2626' : spent / (budget || 1) > 0.8 ? '#d97706' : cat.color;
+
+      const div = document.createElement('div');
+      div.className = 'budget-item';
+      div.innerHTML = `
+        <div class="budget-item-header">
+          <span class="budget-cat-name">
+            <span class="cat-dot" style="background:${cat.color}"></span>
+            ${cat.label}
+          </span>
+          <span class="budget-status ${isOver ? 'budget-over' : ''}">${formatYen(spent)}${budget > 0 ? ' / ' + formatYen(budget) : ''}</span>
+        </div>
+        <div class="budget-input-row">
+          <input class="budget-input" type="number" min="0" step="1000" placeholder="予算なし"
+                 value="${budget > 0 ? budget : ''}" data-cat="${cat.id}" />
+          <span style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap">円/月</span>
+        </div>
+        ${budget > 0 ? `
+          <div class="budget-progress">
+            <div class="budget-bar" style="width:${pct}%;background:${barColor}"></div>
+          </div>
+        ` : ''}
+      `;
+      container.appendChild(div);
+    }
+
+    // 予算入力イベント
+    container.querySelectorAll('.budget-input').forEach(inp => {
+      inp.addEventListener('change', () => {
+        const el = inp as HTMLInputElement;
+        const cat = el.dataset.cat!;
+        const val = parseFloat(el.value);
+        if (!isNaN(val) && val > 0) budgets[cat] = val;
+        else delete budgets[cat];
+        saveData();
+        renderBudget();
+      });
+    });
+  }
+
+  function renderTransactions(filterText = '', filterCat = '') {
+    const tbody = document.getElementById('transactions-body') as HTMLElement;
+    const noResults = document.getElementById('no-results') as HTMLElement;
+    const table = document.getElementById('transactions-table') as HTMLElement;
+
+    const txs = transactions.filter(t => {
+      if (!txInMonth(t, selectedMonth)) return false;
+      if (filterText && !t.store.toLowerCase().includes(filterText.toLowerCase())) return false;
+      if (filterCat && t.category !== filterCat) return false;
+      return true;
+    });
+
+    if (txs.length === 0) {
+      table.hidden = true;
+      noResults.hidden = false;
+    } else {
+      table.hidden = false;
+      noResults.hidden = true;
+    }
+
+    tbody.innerHTML = '';
+    for (const tx of txs) {
+      const cat = CATEGORY_MAP[tx.category] ?? CATEGORY_MAP['other'];
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="td-date">${formatDateJP(tx.date)}</td>
+        <td class="td-store" title="${tx.store}">${tx.store}</td>
+        <td class="td-amount">${formatYen(tx.amount)}</td>
+        <td class="td-cat">
+          <select data-id="${tx.id}">
+            ${CATEGORIES.map(c => `<option value="${c.id}" ${c.id === tx.category ? 'selected' : ''}>${c.label}</option>`).join('')}
+          </select>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    // カテゴリ変更イベント
+    tbody.querySelectorAll('select').forEach(sel => {
+      sel.addEventListener('change', () => {
+        const el = sel as HTMLSelectElement;
+        const id = el.dataset.id!;
+        const tx = transactions.find(t => t.id === id);
+        if (tx) {
+          tx.category = el.value;
+          saveData();
+          renderCharts();
+          renderBudget();
+        }
+      });
+    });
+  }
+
+  function renderCategoryFilter() {
+    const sel = document.getElementById('category-filter') as HTMLSelectElement;
+    const usedCats = new Set(transactions.filter(t => txInMonth(t, selectedMonth)).map(t => t.category));
+    sel.innerHTML = '<option value="">すべてのカテゴリ</option>';
+    for (const cat of CATEGORIES) {
+      if (usedCats.has(cat.id)) {
+        const opt = document.createElement('option');
+        opt.value = cat.id;
+        opt.textContent = cat.label;
+        sel.appendChild(opt);
+      }
+    }
+  }
+
+  function renderCharts() {
+    renderCategoryChart();
+    renderMonthlyChart();
+  }
+
+  function renderAll() {
+    renderStats();
+    renderCharts();
+    renderBudget();
+    renderCategoryFilter();
+    renderTransactions(
+      (document.getElementById('search-input') as HTMLInputElement).value,
+      (document.getElementById('category-filter') as HTMLSelectElement).value,
+    );
+  }
+
+  function showApp() {
+    (document.getElementById('empty-state') as HTMLElement).hidden = true;
+    (document.getElementById('app') as HTMLElement).hidden = false;
+    (document.getElementById('reset-btn') as HTMLElement).style.display = '';
+  }
+
+  function hideApp() {
+    (document.getElementById('empty-state') as HTMLElement).hidden = false;
+    (document.getElementById('app') as HTMLElement).hidden = true;
+    (document.getElementById('reset-btn') as HTMLElement).style.display = 'none';
+  }
+
+  // ----------------------------------------------------------------
+  // イベントハンドラー
+  // ----------------------------------------------------------------
+  function onCSVLoad(file: File) {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onload = (e) => {
+      const buf = e.target?.result as ArrayBuffer;
+      let text = '';
+      try {
+        text = new TextDecoder('utf-8').decode(buf);
+        // UTF-8 として文字化けしている場合は Shift-JIS を試みる
+        if (text.includes('�')) text = new TextDecoder('shift-jis').decode(buf);
+      } catch {
+        text = new TextDecoder('shift-jis').decode(buf);
+      }
+
+      const parsed = parseCSV(text);
+      if (parsed.length === 0) {
+        alert('取引データが見つかりませんでした。\nPayPayアプリからエクスポートしたCSVを確認してください。');
+        return;
+      }
+
+      // 既存データとマージ（重複排除）
+      const existingIds = new Set(transactions.map(t => t.id));
+      const newTxs = parsed.filter(t => !existingIds.has(t.id));
+      transactions = [...transactions, ...newTxs].sort((a, b) => b.date.getTime() - a.date.getTime());
+
+      // 最新月を選択
+      if (transactions.length > 0) selectedMonth = formatMonth(transactions[0].date);
+
+      saveData();
+      showApp();
+      renderAll();
+
+      alert(`${parsed.length}件を読み込みました（新規 ${newTxs.length}件）。`);
+    };
+  }
+
+  // ----------------------------------------------------------------
+  // 初期化
+  // ----------------------------------------------------------------
+  document.addEventListener('DOMContentLoaded', () => {
+    loadData();
+
+    if (transactions.length > 0) {
+      selectedMonth = formatMonth(transactions[0].date);
+      showApp();
+      renderAll();
+    }
+
+    // CSV ファイル選択
+    const csvInput = document.getElementById('csv-input') as HTMLInputElement;
+    csvInput.addEventListener('change', () => {
+      const file = csvInput.files?.[0];
+      if (file) { onCSVLoad(file); csvInput.value = ''; }
+    });
+
+    // リセット
+    document.getElementById('reset-btn')!.addEventListener('click', () => {
+      if (!confirm('すべてのデータを削除しますか？')) return;
+      transactions = [];
+      budgets = {};
+      localStorage.removeItem('paypay_transactions');
+      localStorage.removeItem('paypay_budgets');
+      if (categoryChart) { categoryChart.destroy(); categoryChart = null; }
+      if (monthlyChart)  { monthlyChart.destroy();  monthlyChart = null; }
+      hideApp();
+    });
+
+    // 月ナビゲーション
+    document.getElementById('prev-month')!.addEventListener('click', () => {
+      const [y, m] = selectedMonth.split('-').map(Number);
+      const prev = new Date(y, m - 2, 1);
+      selectedMonth = formatMonth(prev);
+      renderAll();
+    });
+    document.getElementById('next-month')!.addEventListener('click', () => {
+      const [y, m] = selectedMonth.split('-').map(Number);
+      const next = new Date(y, m, 1);
+      selectedMonth = formatMonth(next);
+      renderAll();
+    });
+
+    // 検索 / フィルター
+    document.getElementById('search-input')!.addEventListener('input', () => {
+      renderTransactions(
+        (document.getElementById('search-input') as HTMLInputElement).value,
+        (document.getElementById('category-filter') as HTMLSelectElement).value,
+      );
+    });
+    document.getElementById('category-filter')!.addEventListener('change', () => {
+      renderTransactions(
+        (document.getElementById('search-input') as HTMLInputElement).value,
+        (document.getElementById('category-filter') as HTMLSelectElement).value,
+      );
+    });
+  });
+</script>
