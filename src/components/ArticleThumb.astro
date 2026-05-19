@@ -72,19 +72,19 @@ const meta = catMeta[category] ?? { label: category, color: '#6b7280', bg: '#f9f
 	}
 
 	.thumb-title {
+		display: none;
+	}
+	.size-large .thumb-title {
+		display: -webkit-box;
 		font-family: var(--font-heading);
-		font-size: 0.85em;
+		font-size: 1.05em;
 		font-weight: 500;
 		color: var(--text);
 		line-height: 1.5;
 		letter-spacing: -0.01em;
-		display: -webkit-box;
 		-webkit-line-clamp: 3;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
-	}
-	.size-large .thumb-title {
-		font-size: 1.05em;
 	}
 
 	.thumb-rule {
