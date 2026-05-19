@@ -37,6 +37,10 @@ const recentPosts = allPosts.slice(0, 10);
 					現場で気づいたことを、そのままメモしています。
 					<a href="/about">→ About</a>
 				</p>
+				<div class="ai-notice">
+					このブログの記事は <strong>AI（Claude）による執筆がメイン</strong> です。<br />
+					アイデア・体験・視点は本人のものですが、文章はAIが生成しています。
+				</div>
 			</div>
 
 			{featuredPosts.length > 0 && (
@@ -108,8 +112,16 @@ const recentPosts = allPosts.slice(0, 10);
 	.intro-profile {
 		font-size: 0.82em;
 		color: var(--text-muted);
-		margin: 0;
+		margin: 0 0 1em;
 		line-height: 1.7;
+	}
+	.ai-notice {
+		font-size: 0.82em;
+		line-height: 1.7;
+		padding: 0.8em 1.1em;
+		border-left: 3px solid var(--accent);
+		background: #f0f6fa;
+		color: var(--text);
 	}
 
 	.section {
