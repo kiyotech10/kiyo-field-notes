@@ -19,7 +19,7 @@ const description = '試験勉強・資格取得のノート。';
 	<head>
 		<BaseHead title={`${title} — ${SITE_TITLE}`} description={description} />
 	</head>
-	<body>
+	<body style="--accent:#7060b0;--accent-light:#8878c8">
 		<Header />
 		<main>
 			<h1>{title}</h1>
@@ -28,7 +28,7 @@ const description = '試験勉強・資格取得のノート。';
 			<ul class="post-list">
 				{
 					posts.map((post) => (
-						<li>
+						<li class="fade-in">
 							<a href={`/study/${post.id}/`}>
 								<h2>{post.data.title}</h2>
 								<p class="post-desc">{post.data.description}</p>

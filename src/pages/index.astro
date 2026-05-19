@@ -66,9 +66,18 @@ const recentPosts = allPosts.slice(0, 10);
 
 			<section class="section">
 				<h2 class="section-label">Recent</h2>
+				<div class="filter-bar">
+					<button class="filter-btn active" data-filter="all">All</button>
+					<button class="filter-btn" data-filter="diary">Diary</button>
+					<button class="filter-btn" data-filter="english">English</button>
+					<button class="filter-btn" data-filter="study">Study</button>
+					<button class="filter-btn" data-filter="reading">Reading</button>
+					<button class="filter-btn" data-filter="nursing">Nursing</button>
+					<button class="filter-btn" data-filter="lifehack">Lifehack</button>
+				</div>
 				<ul class="post-list">
 					{recentPosts.map((post) => (
-						<li>
+						<li class="fade-in" data-category={post.category}>
 							<a href={`/${post.category}/${post.id}/`} class="post-row">
 								<div class="post-thumb">
 									<ArticleThumb title={post.data.title} category={post.category} />
@@ -83,6 +92,22 @@ const recentPosts = allPosts.slice(0, 10);
 					))}
 				</ul>
 			</section>
+
+			<script>
+				const btns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+				const items = document.querySelectorAll<HTMLElement>('.post-list li[data-category]');
+				btns.forEach((btn) => {
+					btn.addEventListener('click', () => {
+						btns.forEach((b) => b.classList.remove('active'));
+						btn.classList.add('active');
+						const f = btn.dataset.filter;
+						items.forEach((item) => {
+							const show = f === 'all' || item.dataset.category === f;
+							item.style.display = show ? '' : 'none';
+						});
+					});
+				});
+			</script>
 
 		</main>
 		<Footer />
@@ -194,6 +219,36 @@ const recentPosts = allPosts.slice(0, 10);
 		font-size: 0.72em;
 		color: var(--text-muted);
 		letter-spacing: 0.02em;
+	}
+
+	/* Filter bar */
+	.filter-bar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5em;
+		margin-bottom: 1.4em;
+	}
+	.filter-btn {
+		font-size: 0.65em;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		padding: 0.4em 0.9em;
+		border: 1px solid var(--border);
+		border-radius: 2em;
+		background: transparent;
+		color: var(--text-muted);
+		cursor: pointer;
+		transition: background 0.15s, color 0.15s, border-color 0.15s;
+		font-family: var(--font-heading);
+	}
+	.filter-btn:hover {
+		border-color: var(--accent);
+		color: var(--accent);
+	}
+	.filter-btn.active {
+		background: var(--accent);
+		border-color: var(--accent);
+		color: #fff;
 	}
 
 	/* Recent list */

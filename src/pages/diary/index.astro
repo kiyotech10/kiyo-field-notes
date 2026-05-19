@@ -19,7 +19,7 @@ const description = '日常の出来事や気づきの記録。';
 	<head>
 		<BaseHead title={`${title} — ${SITE_TITLE}`} description={description} />
 	</head>
-	<body>
+	<body style="--accent:#c45c4a;--accent-light:#d4776a">
 		<Header />
 		<main>
 			<h1>{title}</h1>
@@ -28,7 +28,7 @@ const description = '日常の出来事や気づきの記録。';
 			<ul class="post-list">
 				{
 					posts.map((post) => (
-						<li>
+						<li class="fade-in">
 							<a href={`/diary/${post.id}/`}>
 								<h2>{post.data.title}</h2>
 								<p class="post-desc">{post.data.description}</p>

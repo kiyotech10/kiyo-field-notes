@@ -27,13 +27,25 @@ const categoryLabels: Record<string, string> = {
 	nursing: 'Nursing',
 	lifehack: 'Lifehack',
 };
+
+const catColors: Record<string, { accent: string; light: string }> = {
+	diary:    { accent: '#c45c4a', light: '#d4776a' },
+	english:  { accent: '#3476a8', light: '#509cc8' },
+	study:    { accent: '#7060b0', light: '#8878c8' },
+	reading:  { accent: '#b07830', light: '#c89050' },
+	nursing:  { accent: '#1e9b8a', light: '#3ab5a3' },
+	lifehack: { accent: '#4a9068', light: '#66a882' },
+};
+const catStyle = category && catColors[category]
+	? `--accent:${catColors[category].accent};--accent-light:${catColors[category].light}`
+	: '';
 ---
 
 <html lang="ja">
 	<head>
 		<BaseHead title={title} description={description} ogType="article" />
 	</head>
-	<body>
+	<body style={catStyle}>
 		<Header />
 		<main>
 			<article>

@@ -7,12 +7,12 @@ interface Props {
 const { title, category, size = 'default' } = Astro.props;
 
 const catMeta: Record<string, { label: string; color: string; bg: string }> = {
-	diary:    { label: 'Diary',     color: '#b06040', bg: '#fdf8f5' },
-	english:  { label: 'English',   color: '#3d6e8a', bg: '#f5f9fc' },
-	study:    { label: 'Study',     color: '#6455a0', bg: '#f8f6fd' },
-	reading:  { label: 'Reading',   color: '#8a7030', bg: '#fdf9f0' },
-	lifehack: { label: 'Lifehack',  color: '#3a7558', bg: '#f4faf7' },
-	nursing:  { label: 'Nursing',   color: '#2e7070', bg: '#f3f9f9' },
+	diary:    { label: 'Diary',     color: '#c45c4a', bg: '#fdf6f5' },
+	english:  { label: 'English',   color: '#3476a8', bg: '#f3f8fc' },
+	study:    { label: 'Study',     color: '#7060b0', bg: '#f6f4fb' },
+	reading:  { label: 'Reading',   color: '#b07830', bg: '#fdf8ef' },
+	lifehack: { label: 'Lifehack',  color: '#4a9068', bg: '#f2faf6' },
+	nursing:  { label: 'Nursing',   color: '#1e9b8a', bg: '#f1fbf9' },
 };
 
 const meta = catMeta[category] ?? { label: category, color: '#6b7280', bg: '#f9fafb' };

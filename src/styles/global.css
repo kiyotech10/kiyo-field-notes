@@ -4,8 +4,8 @@
 	--bg: #ffffff;
 	--text: #1a1c22;
 	--text-muted: #6b7280;
-	--accent: #3d6e8a;
-	--accent-light: #5b90b0;
+	--accent: #2a9d8f;
+	--accent-light: #48b8ab;
 	--border: #e5e7eb;
 	--max-width: 700px;
 	--font-body: 'Noto Sans JP', 'Inter', -apple-system, sans-serif;
@@ -146,6 +146,16 @@ li { margin-bottom: 0.4em; }
 		padding: 2.5em 0;
 		max-width: calc(100% - 2rem);
 	}
+}
+
+.fade-in {
+	opacity: 0;
+	transform: translateY(18px);
+	transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.fade-in.visible {
+	opacity: 1;
+	transform: none;
 }
 
 .sr-only {

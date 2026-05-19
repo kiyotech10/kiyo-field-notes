@@ -8,6 +8,33 @@ const today = new Date();
 	</div>
 </footer>
 
+<button id="back-to-top" aria-label="ページトップへ">↑</button>
+
+<script>
+	// Back to top
+	const btn = document.getElementById('back-to-top');
+	window.addEventListener('scroll', () => {
+		btn?.classList.toggle('visible', window.scrollY > 300);
+	});
+	btn?.addEventListener('click', () => {
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+	});
+
+	// Scroll fade-in
+	const observer = new IntersectionObserver(
+		(entries) => {
+			entries.forEach((entry) => {
+				if (entry.isIntersecting) {
+					entry.target.classList.add('visible');
+					observer.unobserve(entry.target);
+				}
+			});
+		},
+		{ threshold: 0.08 },
+	);
+	document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+</script>
+
 <style>
 	footer {
 		border-top: 1px solid var(--border);
@@ -21,5 +48,34 @@ const today = new Date();
 		color: var(--text-muted);
 		margin: 0;
 		letter-spacing: 0.03em;
+	}
+
+	#back-to-top {
+		position: fixed;
+		bottom: 2rem;
+		right: 2rem;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: var(--accent);
+		color: #fff;
+		border: none;
+		cursor: pointer;
+		font-size: 1.1em;
+		line-height: 1;
+		opacity: 0;
+		transform: translateY(12px);
+		transition: opacity 0.3s, transform 0.3s, background 0.2s;
+		pointer-events: none;
+		z-index: 200;
+		box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+	}
+	#back-to-top.visible {
+		opacity: 1;
+		transform: translateY(0);
+		pointer-events: all;
+	}
+	#back-to-top:hover {
+		background: var(--accent-light);
 	}
 </style>
