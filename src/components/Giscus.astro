@@ -1,12 +1,4 @@
 ---
-// Giscus configuration
-// Setup: https://giscus.app/ja
-// 1. kiyotech10/kiyo-field-notes の Discussions を有効にする (Settings → Features → Discussions)
-// 2. https://giscus.app/ja で repo-id / category-id を取得して下記を更新する
-const REPO = 'kiyotech10/kiyo-field-notes';
-const REPO_ID = 'REPLACE_WITH_REPO_ID';      // giscus.app で取得
-const CATEGORY = 'General';
-const CATEGORY_ID = 'REPLACE_WITH_CATEGORY_ID'; // giscus.app で取得
 ---
 
 <section class="comments">
@@ -14,16 +6,16 @@ const CATEGORY_ID = 'REPLACE_WITH_CATEGORY_ID'; // giscus.app で取得
 	<script
 		is:inline
 		src="https://giscus.app/client.js"
-		data-repo={REPO}
-		data-repo-id={REPO_ID}
-		data-category={CATEGORY}
-		data-category-id={CATEGORY_ID}
+		data-repo="kiyotech10/kiyo-field-notes"
+		data-repo-id="R_kgDOSYq_gQ"
+		data-category="General"
+		data-category-id="DIC_kwDOSYq_gc4C9YlQ"
 		data-mapping="pathname"
 		data-strict="0"
 		data-reactions-enabled="1"
 		data-emit-metadata="0"
 		data-input-position="bottom"
-		data-theme="light"
+		data-theme="preferred_color_scheme"
 		data-lang="ja"
 		data-loading="lazy"
 		crossorigin="anonymous"
@@ -38,8 +30,8 @@ const CATEGORY_ID = 'REPLACE_WITH_CATEGORY_ID'; // giscus.app で取得
 		border-top: 1px solid var(--border);
 	}
 	.comments-heading {
-		font-size: 0.8em;
-		letter-spacing: 0.12em;
+		font-size: 0.68em;
+		letter-spacing: 0.16em;
 		text-transform: uppercase;
 		color: var(--text-muted);
 		font-weight: 400;
