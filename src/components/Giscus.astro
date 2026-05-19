@@ -1,0 +1,48 @@
+---
+// Giscus configuration
+// Setup: https://giscus.app/ja
+// 1. kiyotech10/kiyo-field-notes の Discussions を有効にする (Settings → Features → Discussions)
+// 2. https://giscus.app/ja で repo-id / category-id を取得して下記を更新する
+const REPO = 'kiyotech10/kiyo-field-notes';
+const REPO_ID = 'REPLACE_WITH_REPO_ID';      // giscus.app で取得
+const CATEGORY = 'General';
+const CATEGORY_ID = 'REPLACE_WITH_CATEGORY_ID'; // giscus.app で取得
+---
+
+<section class="comments">
+	<h2 class="comments-heading">Comments</h2>
+	<script
+		is:inline
+		src="https://giscus.app/client.js"
+		data-repo={REPO}
+		data-repo-id={REPO_ID}
+		data-category={CATEGORY}
+		data-category-id={CATEGORY_ID}
+		data-mapping="pathname"
+		data-strict="0"
+		data-reactions-enabled="1"
+		data-emit-metadata="0"
+		data-input-position="bottom"
+		data-theme="light"
+		data-lang="ja"
+		data-loading="lazy"
+		crossorigin="anonymous"
+		async
+	></script>
+</section>
+
+<style>
+	.comments {
+		margin-top: 3em;
+		padding-top: 2em;
+		border-top: 1px solid var(--border);
+	}
+	.comments-heading {
+		font-size: 0.8em;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+		font-weight: 400;
+		margin: 0 0 1.5em;
+	}
+</style>
