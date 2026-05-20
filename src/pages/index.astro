@@ -455,8 +455,8 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 	.post-list li:first-child { border-top: 1px solid var(--border); }
 	.post-row {
 		display: grid;
-		grid-template-columns: 100px 1fr;
-		gap: 1.2em;
+		grid-template-columns: 88px 1fr;
+		gap: 1em;
 		padding: 1em 0;
 		text-decoration: none;
 		color: var(--text);
@@ -537,6 +537,6 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 
 	@media (max-width: 600px) {
 		.featured-grid { grid-template-columns: 1fr; }
-		.post-row { grid-template-columns: 80px 1fr; gap: 0.8em; }
+		.post-row { grid-template-columns: 72px 1fr; gap: 0.8em; }
 	}
 </style>

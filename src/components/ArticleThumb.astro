@@ -52,11 +52,17 @@ const meta = catMeta[category] ?? { label: category, color: '#6b7280', bg: '#f9f
 		background: var(--cat-color);
 	}
 
+	/* small size: clean color block, no text */
 	.thumb-inner {
+		display: none;
+	}
+
+	/* large size: show title + rule */
+	.size-large .thumb-inner {
+		display: flex;
 		position: absolute;
 		inset: 0;
 		padding: 1.3em 1.4em;
-		display: flex;
 		flex-direction: column;
 		justify-content: flex-end;
 		gap: 0.55em;
@@ -72,9 +78,6 @@ const meta = catMeta[category] ?? { label: category, color: '#6b7280', bg: '#f9f
 	}
 
 	.thumb-title {
-		display: none;
-	}
-	.size-large .thumb-title {
 		display: -webkit-box;
 		font-family: var(--font-heading);
 		font-size: 1.05em;
