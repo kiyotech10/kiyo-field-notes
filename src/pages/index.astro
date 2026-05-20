@@ -17,7 +17,9 @@ const allPosts = [
 ].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const featuredPosts = allPosts.filter((p) => p.data.featured).slice(0, 4);
-const recentPosts = allPosts.slice(0, 10);
+const recentPosts = allPosts.slice(0, 20);
+
+const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 ---
 
 <!doctype html>
@@ -29,21 +31,30 @@ const recentPosts = allPosts.slice(0, 10);
 		<Header />
 		<main>
 
+			<!-- Intro: シンプルに -->
 			<div class="intro">
-				<h1 class="intro-title">{SITE_TITLE}</h1>
-				<p class="intro-profile">
-					男性看護師 / TOEIC 905 / ライフハック好き。
-					現場で気づいたことを、そのままメモしています。
-					<a href="/about">→ About</a>
-				</p>
-				<div class="ai-notice">
-					このブログの記事は <strong>AI（Claude）による執筆がメイン</strong> です。<br />
-					アイデア・体験・視点は本人のものですが、文章はAIが生成しています。
-				</div>
+				<p class="intro-tagline">男性看護師 / TOEIC 905 / ライフハック好き</p>
 			</div>
 
+			<!-- Search -->
+			<div class="search-wrap">
+				<div class="search-box">
+					<svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+					<input
+						id="search-input"
+						type="search"
+						placeholder="記事を検索…"
+						autocomplete="off"
+						spellcheck="false"
+					/>
+					<button id="search-clear" class="clear-btn" aria-label="クリア">×</button>
+				</div>
+				<div id="search-results" class="search-results" hidden></div>
+			</div>
+
+			<!-- Featured -->
 			{featuredPosts.length > 0 && (
-				<section class="section">
+				<section class="section" id="featured-section">
 					<h2 class="section-label">Featured</h2>
 					<div class="featured-grid">
 						{featuredPosts.map((post) => (
@@ -54,7 +65,12 @@ const recentPosts = allPosts.slice(0, 10);
 								<div class="card-body">
 									<span class="card-cat">{post.category}</span>
 									<h3 class="card-title">{post.data.title}</h3>
-									<time class="card-date"><FormattedDate date={post.data.pubDate} /></time>
+									<div class="card-footer">
+										<time class="card-date"><FormattedDate date={post.data.pubDate} /></time>
+										{(post.data.tags ?? []).slice(0, 2).map((tag) => (
+											<a href={`/tags/${tag}/`} class="tag-chip" onclick="event.stopPropagation()">#{tag}</a>
+										))}
+									</div>
 								</div>
 							</a>
 						))}
@@ -62,8 +78,10 @@ const recentPosts = allPosts.slice(0, 10);
 				</section>
 			)}
 
-			<section class="section">
+			<!-- Recent -->
+			<section class="section" id="recent-section">
 				<h2 class="section-label">Recent</h2>
+				<!-- Filter bar -->
 				<div class="filter-bar">
 					<button class="filter-btn active" data-filter="all">All</button>
 					<button class="filter-btn" data-filter="diary">Diary</button>
@@ -83,7 +101,12 @@ const recentPosts = allPosts.slice(0, 10);
 								<div class="post-info">
 									<span class="post-cat">{post.category}</span>
 									<span class="post-title">{post.data.title}</span>
-									<time class="post-date"><FormattedDate date={post.data.pubDate} /></time>
+									<div class="post-meta">
+										<time class="post-date"><FormattedDate date={post.data.pubDate} /></time>
+										{(post.data.tags ?? []).slice(0, 3).map((tag) => (
+											<a href={`/tags/${tag}/`} class="tag-chip" onclick="event.stopPropagation()">#{tag}</a>
+										))}
+									</div>
 								</div>
 							</a>
 						</li>
@@ -91,65 +114,260 @@ const recentPosts = allPosts.slice(0, 10);
 				</ul>
 			</section>
 
-			<script>
-				const btns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
-				const items = document.querySelectorAll<HTMLElement>('.post-list li[data-category]');
-				btns.forEach((btn) => {
-					btn.addEventListener('click', () => {
-						btns.forEach((b) => b.classList.remove('active'));
-						btn.classList.add('active');
-						const f = btn.dataset.filter;
-						items.forEach((item) => {
-							const show = f === 'all' || item.dataset.category === f;
-							item.style.display = show ? '' : 'none';
-						});
-					});
-				});
-			</script>
+			<!-- Tags cloud -->
+			{allTags.length > 0 && (
+				<section class="section tags-section">
+					<h2 class="section-label">Tags</h2>
+					<div class="tags-cloud">
+						{allTags.map((tag) => (
+							<a href={`/tags/${tag}/`} class="tag-pill">#{tag}</a>
+						))}
+					</div>
+				</section>
+			)}
 
 		</main>
 		<Footer />
 	</body>
 </html>
 
-<style>
-	.intro {
-		margin-bottom: 4em;
-		padding-bottom: 2.5em;
-		border-bottom: 1px solid var(--border);
-	}
-	.intro-title {
-		font-size: 1.1em;
-		font-weight: 500;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		margin: 0 0 0.5em;
-		color: var(--text);
-	}
-	.intro-desc {
-		font-size: 0.9em;
-		color: var(--text-muted);
-		margin: 0 0 0.6em;
-		line-height: 1.7;
-	}
-	.intro-profile {
-		font-size: 0.82em;
-		color: var(--text-muted);
-		margin: 0 0 1em;
-		line-height: 1.7;
-	}
-	.ai-notice {
-		font-size: 0.82em;
-		line-height: 1.7;
-		padding: 0.8em 1.1em;
-		border-left: 3px solid var(--accent);
-		background: #f0f6fa;
-		color: var(--text);
+<script>
+	// Category filter
+	const btns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+	const items = document.querySelectorAll<HTMLElement>('.post-list li[data-category]');
+	btns.forEach((btn) => {
+		btn.addEventListener('click', () => {
+			btns.forEach((b) => b.classList.remove('active'));
+			btn.classList.add('active');
+			const f = btn.dataset.filter;
+			items.forEach((item) => {
+				item.style.display = f === 'all' || item.dataset.category === f ? '' : 'none';
+			});
+		});
+	});
+
+	// Search
+	type Post = {
+		title: string;
+		description: string;
+		category: string;
+		tags: string[];
+		pubDate: string;
+		url: string;
+	};
+
+	const input = document.getElementById('search-input') as HTMLInputElement;
+	const clearBtn = document.getElementById('search-clear') as HTMLButtonElement;
+	const resultsEl = document.getElementById('search-results') as HTMLDivElement;
+	const featuredSection = document.getElementById('featured-section');
+	const recentSection = document.getElementById('recent-section');
+
+	let posts: Post[] = [];
+	let loaded = false;
+
+	async function loadPosts() {
+		if (loaded) return;
+		loaded = true;
+		try {
+			const res = await fetch('/search.json');
+			posts = await res.json();
+		} catch {
+			posts = [];
+		}
 	}
 
-	.section {
-		margin-bottom: 4em;
+	function highlight(text: string, query: string): string {
+		if (!query) return text;
+		const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		return text.replace(new RegExp(escaped, 'gi'), (m) => `<mark>${m}</mark>`);
 	}
+
+	function renderResults(query: string) {
+		const q = query.trim().toLowerCase();
+		if (!q) {
+			resultsEl.hidden = true;
+			if (featuredSection) featuredSection.style.display = '';
+			recentSection!.style.display = '';
+			clearBtn.style.display = 'none';
+			return;
+		}
+
+		clearBtn.style.display = '';
+		if (featuredSection) featuredSection.style.display = 'none';
+		recentSection!.style.display = 'none';
+
+		const matched = posts.filter((p) => {
+			const haystack = `${p.title} ${p.description} ${p.category} ${p.tags.join(' ')}`.toLowerCase();
+			return haystack.includes(q);
+		});
+
+		if (matched.length === 0) {
+			resultsEl.innerHTML = '<p class="no-results">記事が見つかりませんでした。</p>';
+		} else {
+			resultsEl.innerHTML = `
+				<p class="results-count">${matched.length}件</p>
+				<ul class="results-list">
+					${matched.map((p) => `
+						<li>
+							<a href="${p.url}" class="result-row">
+								<span class="result-cat">${p.category}</span>
+								<span class="result-title">${highlight(p.title, query.trim())}</span>
+								<div class="result-meta">
+									<span class="result-date">${p.pubDate.slice(0, 10)}</span>
+									${p.tags.map((t) => `<a href="/tags/${t}/" class="tag-chip">#${t}</a>`).join('')}
+								</div>
+							</a>
+						</li>
+					`).join('')}
+				</ul>
+			`;
+		}
+		resultsEl.hidden = false;
+	}
+
+	input.addEventListener('focus', loadPosts);
+	input.addEventListener('input', (e) => {
+		loadPosts().then(() => renderResults((e.target as HTMLInputElement).value));
+	});
+	clearBtn.addEventListener('click', () => {
+		input.value = '';
+		renderResults('');
+		input.focus();
+	});
+
+	// Intersection Observer for fade-in
+	const observer = new IntersectionObserver(
+		(entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+		{ threshold: 0.05 }
+	);
+	document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+</script>
+
+<style>
+	/* Intro */
+	.intro {
+		margin-bottom: 2em;
+	}
+	.intro-tagline {
+		font-size: 0.8em;
+		color: var(--text-muted);
+		margin: 0;
+		letter-spacing: 0.02em;
+	}
+
+	/* Search */
+	.search-wrap {
+		margin-bottom: 3em;
+		position: relative;
+	}
+	.search-box {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		padding: 0.55em 0.9em;
+		background: #fafafa;
+		transition: border-color 0.15s;
+	}
+	.search-box:focus-within {
+		border-color: var(--accent);
+		background: #fff;
+	}
+	.search-icon {
+		color: var(--text-muted);
+		flex-shrink: 0;
+	}
+	#search-input {
+		border: none;
+		background: transparent;
+		outline: none;
+		font-size: 0.88em;
+		font-family: var(--font-body);
+		color: var(--text);
+		width: 100%;
+	}
+	#search-input::placeholder { color: var(--text-muted); }
+	.clear-btn {
+		display: none;
+		border: none;
+		background: none;
+		color: var(--text-muted);
+		cursor: pointer;
+		font-size: 1em;
+		padding: 0;
+		line-height: 1;
+		flex-shrink: 0;
+	}
+	.clear-btn:hover { color: var(--text); }
+
+	.search-results {
+		margin-top: 0.5em;
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		background: #fff;
+		overflow: hidden;
+	}
+	.no-results {
+		font-size: 0.82em;
+		color: var(--text-muted);
+		padding: 1em 1.2em;
+		margin: 0;
+	}
+	.results-count {
+		font-size: 0.7em;
+		color: var(--text-muted);
+		letter-spacing: 0.06em;
+		padding: 0.7em 1.2em 0;
+		margin: 0;
+	}
+	.results-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.results-list li { border-bottom: 1px solid var(--border); }
+	.results-list li:last-child { border-bottom: none; }
+	.result-row {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2em;
+		padding: 0.8em 1.2em;
+		text-decoration: none;
+		color: var(--text);
+		transition: background 0.1s;
+	}
+	.result-row:hover { background: #f9fafb; text-decoration: none; }
+	.result-cat {
+		font-size: 0.6em;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--accent);
+		font-weight: 500;
+	}
+	.result-title {
+		font-size: 0.88em;
+		font-weight: 500;
+		line-height: 1.4;
+	}
+	.result-title :global(mark) {
+		background: #fffde7;
+		color: inherit;
+		border-radius: 2px;
+	}
+	.result-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		flex-wrap: wrap;
+	}
+	.result-date {
+		font-size: 0.68em;
+		color: var(--text-muted);
+	}
+
+	/* Section */
+	.section { margin-bottom: 4em; }
 	.section-label {
 		font-size: 0.68em;
 		letter-spacing: 0.16em;
@@ -174,15 +392,9 @@ const recentPosts = allPosts.slice(0, 10);
 		text-decoration: none;
 		color: var(--text);
 	}
-	.featured-card:hover .card-thumb {
-		opacity: 0.85;
-	}
-	.featured-card:hover .card-title {
-		color: var(--accent);
-	}
-	.card-thumb {
-		transition: opacity 0.2s;
-	}
+	.featured-card:hover .card-thumb { opacity: 0.85; }
+	.featured-card:hover .card-title { color: var(--accent); }
+	.card-thumb { transition: opacity 0.2s; }
 	.card-body {
 		display: flex;
 		flex-direction: column;
@@ -203,10 +415,15 @@ const recentPosts = allPosts.slice(0, 10);
 		letter-spacing: -0.01em;
 		transition: color 0.15s;
 	}
+	.card-footer {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		flex-wrap: wrap;
+	}
 	.card-date {
 		font-size: 0.72em;
 		color: var(--text-muted);
-		letter-spacing: 0.02em;
 	}
 
 	/* Filter bar */
@@ -229,50 +446,29 @@ const recentPosts = allPosts.slice(0, 10);
 		transition: background 0.15s, color 0.15s, border-color 0.15s;
 		font-family: var(--font-heading);
 	}
-	.filter-btn:hover {
-		border-color: var(--accent);
-		color: var(--accent);
-	}
-	.filter-btn.active {
-		background: var(--accent);
-		border-color: var(--accent);
-		color: #fff;
-	}
+	.filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+	.filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-	/* Recent list */
-	.post-list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-	}
-	.post-list li {
-		border-bottom: 1px solid var(--border);
-	}
-	.post-list li:first-child {
-		border-top: 1px solid var(--border);
-	}
+	/* Post list */
+	.post-list { list-style: none; margin: 0; padding: 0; }
+	.post-list li { border-bottom: 1px solid var(--border); }
+	.post-list li:first-child { border-top: 1px solid var(--border); }
 	.post-row {
 		display: grid;
-		grid-template-columns: 130px 1fr;
+		grid-template-columns: 100px 1fr;
 		gap: 1.2em;
-		padding: 1.1em 0;
+		padding: 1em 0;
 		text-decoration: none;
 		color: var(--text);
 		align-items: center;
 	}
-	.post-row:hover .post-title {
-		color: var(--accent);
-	}
-	.post-row:hover .post-thumb {
-		opacity: 0.85;
-	}
-	.post-thumb {
-		transition: opacity 0.2s;
-	}
+	.post-row:hover .post-title { color: var(--accent); }
+	.post-row:hover .post-thumb { opacity: 0.85; }
+	.post-thumb { transition: opacity 0.2s; }
 	.post-info {
 		display: flex;
 		flex-direction: column;
-		gap: 0.25em;
+		gap: 0.2em;
 	}
 	.post-cat {
 		font-size: 0.6em;
@@ -282,25 +478,65 @@ const recentPosts = allPosts.slice(0, 10);
 		font-weight: 500;
 	}
 	.post-title {
-		font-size: 0.9em;
+		font-size: 0.88em;
 		font-weight: 500;
 		line-height: 1.5;
 		letter-spacing: -0.01em;
 		transition: color 0.15s;
 	}
+	.post-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		flex-wrap: wrap;
+	}
 	.post-date {
-		font-size: 0.7em;
+		font-size: 0.68em;
 		color: var(--text-muted);
-		letter-spacing: 0.02em;
+	}
+
+	/* Tag chips (shared) */
+	.tag-chip {
+		font-size: 0.65em;
+		color: var(--text-muted);
+		text-decoration: none;
+		border: 1px solid var(--border);
+		border-radius: 2em;
+		padding: 0.1em 0.55em;
+		transition: color 0.15s, border-color 0.15s;
+		white-space: nowrap;
+	}
+	.tag-chip:hover {
+		color: var(--accent);
+		border-color: var(--accent);
+		text-decoration: none;
+	}
+
+	/* Tags cloud */
+	.tags-section { margin-bottom: 3em; }
+	.tags-cloud {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5em;
+	}
+	.tag-pill {
+		font-size: 0.72em;
+		color: var(--text-muted);
+		text-decoration: none;
+		border: 1px solid var(--border);
+		border-radius: 2em;
+		padding: 0.3em 0.8em;
+		transition: color 0.15s, border-color 0.15s, background 0.15s;
+	}
+	.tag-pill:hover {
+		color: var(--accent);
+		border-color: var(--accent);
+		background: #f0faf8;
+		text-decoration: none;
 	}
 
 	@media (max-width: 600px) {
-		.featured-grid {
-			grid-template-columns: 1fr;
-		}
-		.post-row {
-			grid-template-columns: 100px 1fr;
-			gap: 0.9em;
-		}
+		.featured-grid { grid-template-columns: 1fr; }
+		.post-row { grid-template-columns: 80px 1fr; gap: 0.8em; }
 	}
 </style>

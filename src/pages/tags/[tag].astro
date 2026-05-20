@@ -1,0 +1,164 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_TITLE } from '../../consts';
+
+export async function getStaticPaths() {
+	const categories = ['diary', 'english', 'study', 'reading', 'nursing', 'lifehack'] as const;
+	const allPosts = (
+		await Promise.all(
+			categories.map(async (cat) => {
+				const items = await getCollection(cat);
+				return items.map((p) => ({ ...p, category: cat }));
+			})
+		)
+	).flat();
+
+	const tagMap = new Map<string, typeof allPosts>();
+	for (const post of allPosts) {
+		for (const tag of post.data.tags ?? []) {
+			if (!tagMap.has(tag)) tagMap.set(tag, []);
+			tagMap.get(tag)!.push(post);
+		}
+	}
+
+	return [...tagMap.entries()].map(([tag, posts]) => ({
+		params: { tag },
+		props: { tag, posts: posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()) },
+	}));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ja">
+	<head>
+		<BaseHead title={`#${tag} — ${SITE_TITLE}`} description={`タグ「${tag}」の記事一覧`} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="page-header">
+				<a href="/" class="back-link">← ホーム</a>
+				<h1 class="tag-heading"><span class="hash">#</span>{tag}</h1>
+				<p class="count">{posts.length}件の記事</p>
+			</div>
+			<ul class="post-list">
+				{posts.map((post) => (
+					<li>
+						<a href={`/${post.category}/${post.id}/`} class="post-row">
+							<div class="post-info">
+								<span class="post-cat">{post.category}</span>
+								<span class="post-title">{post.data.title}</span>
+								<div class="post-meta">
+									<time class="post-date"><FormattedDate date={post.data.pubDate} /></time>
+									{(post.data.tags ?? []).filter((t) => t !== tag).map((t) => (
+										<a href={`/tags/${t}/`} class="tag-chip">#{t}</a>
+									))}
+								</div>
+							</div>
+						</a>
+					</li>
+				))}
+			</ul>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.page-header {
+		margin-bottom: 2.5em;
+		padding-bottom: 1.5em;
+		border-bottom: 1px solid var(--border);
+	}
+	.back-link {
+		display: inline-block;
+		font-size: 0.7em;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+		text-decoration: none;
+		margin-bottom: 1em;
+	}
+	.back-link:hover { color: var(--accent); text-decoration: none; }
+	.tag-heading {
+		font-size: 1.6em;
+		font-weight: 500;
+		margin: 0 0 0.2em;
+		letter-spacing: -0.01em;
+	}
+	.hash { color: var(--accent); }
+	.count {
+		font-size: 0.78em;
+		color: var(--text-muted);
+		margin: 0;
+	}
+
+	.post-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.post-list li {
+		border-bottom: 1px solid var(--border);
+	}
+	.post-list li:first-child {
+		border-top: 1px solid var(--border);
+	}
+	.post-row {
+		display: flex;
+		padding: 1.1em 0;
+		text-decoration: none;
+		color: var(--text);
+	}
+	.post-row:hover .post-title { color: var(--accent); }
+	.post-info {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25em;
+		width: 100%;
+	}
+	.post-cat {
+		font-size: 0.6em;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--accent);
+		font-weight: 500;
+	}
+	.post-title {
+		font-size: 0.9em;
+		font-weight: 500;
+		line-height: 1.5;
+		letter-spacing: -0.01em;
+		transition: color 0.15s;
+	}
+	.post-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.6em;
+		flex-wrap: wrap;
+	}
+	.post-date {
+		font-size: 0.7em;
+		color: var(--text-muted);
+	}
+	.tag-chip {
+		font-size: 0.65em;
+		color: var(--text-muted);
+		text-decoration: none;
+		border: 1px solid var(--border);
+		border-radius: 2em;
+		padding: 0.1em 0.5em;
+		transition: color 0.15s, border-color 0.15s;
+	}
+	.tag-chip:hover {
+		color: var(--accent);
+		border-color: var(--accent);
+		text-decoration: none;
+	}
+</style>

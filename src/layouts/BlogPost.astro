@@ -15,9 +15,10 @@ interface Props {
 	heroImage?: ImageMetadata;
 	category?: string;
 	readingTime?: number;
+	tags?: string[];
 }
 
-const { title, description, pubDate, updatedDate, heroImage, category, readingTime } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, category, readingTime, tags } = Astro.props;
 
 const categoryLabels: Record<string, string> = {
 	diary: 'Diary',
@@ -68,6 +69,13 @@ const catStyle = category && catColors[category]
 							{updatedDate && (
 								<span class="updated">（更新: <FormattedDate date={updatedDate} />）</span>
 							)}
+						</div>
+					)}
+					{tags && tags.length > 0 && (
+						<div class="tags-row">
+							{tags.map((tag) => (
+								<a href={`/tags/${tag}/`} class="tag-chip">#{tag}</a>
+							))}
 						</div>
 					)}
 					<hr />
@@ -125,6 +133,26 @@ const catStyle = category && catColors[category]
 	.updated {
 		margin-left: 1em;
 		font-style: italic;
+	}
+	.tags-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4em;
+		margin-top: 0.6em;
+	}
+	.tag-chip {
+		font-size: 0.68em;
+		color: var(--text-muted);
+		text-decoration: none;
+		border: 1px solid var(--border);
+		border-radius: 2em;
+		padding: 0.15em 0.6em;
+		transition: color 0.15s, border-color 0.15s;
+	}
+	.tag-chip:hover {
+		color: var(--accent);
+		border-color: var(--accent);
+		text-decoration: none;
 	}
 	.contact-nudge {
 		font-size: 0.8em;

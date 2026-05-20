@@ -10,6 +10,7 @@ const postSchema = ({ image }: { image: () => z.ZodType }) =>
 		updatedDate: z.coerce.date().optional(),
 		heroImage: z.optional(image()),
 		featured: z.boolean().optional(),
+		tags: z.array(z.string()).optional(),
 	});
 
 const diary = defineCollection({
