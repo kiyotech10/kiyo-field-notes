@@ -17,7 +17,8 @@ const allPosts = [
 ].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const featuredPosts = allPosts.filter((p) => p.data.featured).slice(0, 4);
-const recentPosts = allPosts.slice(0, 20);
+const featuredIds = new Set(featuredPosts.map((p) => `${p.category}:${p.id}`));
+const recentPosts = allPosts.filter((p) => !featuredIds.has(`${p.category}:${p.id}`)).slice(0, 20);
 
 const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 ---
