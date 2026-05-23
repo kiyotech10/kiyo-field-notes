@@ -12,6 +12,40 @@ import { SITE_TITLE } from '../consts';
       title={`PayPay クレジット家計管理 - ${SITE_TITLE}`} 
       description="PayPayの利用履歴CSVを読み込み、ブラウザ内で安全に家計簿として管理・分析できる無料ツールです。データの外部送信は一切ありません。" 
     />
+    <script is:inline>
+      // 起動時に最優先で LocalStorage の破損データをクレンジング
+      (function() {
+        try {
+          var LS_TX = 'paypay_transactions';
+          var txRaw = localStorage.getItem(LS_TX);
+          if (txRaw) {
+            var parsed = JSON.parse(txRaw);
+            if (Array.isArray(parsed)) {
+              var filtered = parsed.filter(function(t) {
+                if (!t || !t.date) return false;
+                var d = new Date(t.date);
+                return !isNaN(d.getTime());
+              });
+              if (filtered.length !== parsed.length) {
+                localStorage.setItem(LS_TX, JSON.stringify(filtered));
+                console.log('Cleaned corrupted transactions from LocalStorage');
+              }
+            }
+          }
+          // 予算とファイル履歴の null ガード
+          var LS_BUD = 'paypay_budgets';
+          if (localStorage.getItem(LS_BUD) === 'null' || !localStorage.getItem(LS_BUD)) {
+            localStorage.setItem(LS_BUD, '{}');
+          }
+          var LS_FILES = 'paypay_files';
+          if (localStorage.getItem(LS_FILES) === 'null' || !localStorage.getItem(LS_FILES)) {
+            localStorage.setItem(LS_FILES, '[]');
+          }
+        } catch (e) {
+          console.error('Cleansing failed:', e);
+        }
+      })();
+    </script>
   </head>
   <body>
     <Header />
@@ -999,19 +1033,40 @@ import { SITE_TITLE } from '../consts';
     if (txRaw) {
       try {
         const parsed = JSON.parse(txRaw) as Array<Transaction & { date: string }>;
-        // Invalid Date (不正な日付) を持つレコードを除外して安全に読み込む
-        transactions = parsed
+        // nullガードを追加し、Invalid Date (不正な日付) を持つレコードを除外
+        transactions = (parsed || [])
+          .filter(t => t && t.date)
           .map(t => ({ ...t, date: new Date(t.date), source: t.source ?? '' }))
-          .filter(t => !isNaN(t.date.getTime()));
+          .filter(t => t.date && !isNaN(t.date.getTime()));
       } catch (e) {
         console.error('Failed to parse transactions:', e);
         transactions = [];
       }
+    } else {
+      transactions = [];
     }
+
     const budRaw = localStorage.getItem(LS_BUD);
-    if (budRaw) budgets = JSON.parse(budRaw);
+    if (budRaw) {
+      try {
+        budgets = JSON.parse(budRaw) || {};
+      } catch {
+        budgets = {};
+      }
+    } else {
+      budgets = {};
+    }
+
     const filesRaw = localStorage.getItem(LS_FILES);
-    if (filesRaw) importedFiles = JSON.parse(filesRaw);
+    if (filesRaw) {
+      try {
+        importedFiles = JSON.parse(filesRaw) || [];
+      } catch {
+        importedFiles = [];
+      }
+    } else {
+      importedFiles = [];
+    }
   }
 
   // ----------------------------------------------------------------
