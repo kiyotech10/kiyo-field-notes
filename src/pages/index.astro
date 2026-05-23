@@ -62,7 +62,7 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 						{featuredPosts.map((post) => (
 							<a href={`/${post.category}/${post.id}/`} class="featured-card">
 								<div class="card-thumb">
-									<ArticleThumb title={post.data.title} category={post.category} size="large" heroImage={post.data.heroImage} />
+									<ArticleThumb title={post.data.title} category={post.category} size="large" />
 								</div>
 								<div class="card-body">
 									<span class="card-cat">{post.category}</span>
@@ -98,7 +98,7 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 						<li class="fade-in" data-category={post.category}>
 							<a href={`/${post.category}/${post.id}/`} class="post-row">
 								<div class="post-thumb">
-									<ArticleThumb title={post.data.title} category={post.category} heroImage={post.data.heroImage} />
+									<ArticleThumb title={post.data.title} category={post.category} />
 								</div>
 								<div class="post-info">
 									<span class="post-cat">{post.category}</span>
