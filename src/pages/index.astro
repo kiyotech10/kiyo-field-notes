@@ -521,13 +521,13 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 	.post-list li:first-child { border-top: 1px solid var(--border); }
 	.post-row {
 		display: grid;
-		grid-template-columns: 88px 1fr;
+		grid-template-columns: 100px 1fr; /* Expanded from 88px for better image balance */
 		gap: 1.5em;
 		padding: 1.2em 1em;
 		margin: 0 -1em; /* Negative margin to expand list row beautifully */
 		text-decoration: none;
 		color: var(--text);
-		align-items: center;
+		align-items: flex-start; /* Top alignment to prevent drifting when text expands */
 		border-radius: 20px;
 		transition: var(--transition-google);
 	}
@@ -573,6 +573,7 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 	.post-date {
 		font-size: 0.72em;
 		color: var(--text-muted);
+		white-space: nowrap; /* Prevent date characters like '日' from wrapping to the next line */
 	}
 
 	/* Tag chips (shared) */
@@ -625,10 +626,11 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 			gap: 1.2rem;
 		}
 		.post-row {
-			grid-template-columns: 72px 1fr;
+			grid-template-columns: 84px 1fr; /* Optimized mobile thumbnail size */
 			gap: 1em;
 			padding: 1em 0.6em;
 			margin: 0 -0.6em;
+			align-items: flex-start; /* Consistent top alignment on mobile */
 		}
 	}
 </style>
