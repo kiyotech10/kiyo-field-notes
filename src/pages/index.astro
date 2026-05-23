@@ -35,6 +35,7 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 			<!-- Intro: シンプルに -->
 			<div class="intro">
 				<p class="intro-tagline">男性看護師</p>
+				<span class="ai-badge">AIによる養生処方</span>
 			</div>
 
 			<!-- Search -->
@@ -247,20 +248,40 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 <style>
 	/* Intro */
 	.intro {
-	margin-bottom: 2em;
+		display: flex;
+		align-items: center;
+		gap: 0.8em;
+		margin-bottom: 3.5em; /* Expanded margin for whitespace */
 	}
 	.intro-tagline {
-		font-size: 0.82em;
+		font-size: 0.85em;
 		color: var(--text-muted);
 		margin: 0;
-		letter-spacing: 0.05em;
-		font-weight: 500;
+		letter-spacing: 0.08em;
+		font-weight: 600;
 		text-transform: uppercase;
+	}
+	.ai-badge {
+		font-size: 0.72em;
+		font-weight: 600;
+		color: #2e5a1c; /* TCM Deep Herb Green */
+		background: #eaf5e6; /* Soft Herb Green */
+		border: 1px solid rgba(46, 90, 28, 0.12);
+		padding: 0.25em 0.85em;
+		border-radius: 999px; /* Rounded Pill Badge */
+		letter-spacing: 0.05em;
+		box-shadow: 0 2px 6px rgba(46, 90, 28, 0.03);
+		transition: var(--transition-google);
+	}
+	.ai-badge:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(46, 90, 28, 0.06);
+		background: #e4f2df;
 	}
 
 	/* Search */
 	.search-wrap {
-		margin-bottom: 3.5em;
+		margin-bottom: 4.8em; /* Expanded for high-breathability */
 		position: relative;
 	}
 	.search-box {
@@ -377,16 +398,17 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 	}
 
 	/* Section */
-	.section { margin-bottom: 4em; }
+	.section { margin-bottom: 5.5em; } /* 30%+ Expanded margin for luxurious whitespace */
 	.section-label {
-		font-size: 0.72em;
+		font-family: var(--font-heading);
+		font-size: 0.8em;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
 		color: var(--text-muted);
 		font-weight: 600;
-		margin: 0 0 1.6em;
+		margin: 0 0 2.2em; /* Expanded margins */
 		border-bottom: 1px solid var(--border);
-		padding-bottom: 0.8em;
+		padding-bottom: 1em; /* Expanded padding */
 	}
 
 	/* Featured grid */
@@ -456,8 +478,8 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 	.filter-bar {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.6em;
-		margin-bottom: 1.8em;
+		gap: 0.7em;
+		margin-bottom: 2.5em; /* Expanded margins */
 	}
 	.filter-btn {
 		font-size: 0.72em;
