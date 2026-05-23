@@ -1580,7 +1580,8 @@ import { SITE_TITLE } from '../consts';
   function openAddModal() {
     const modal = document.getElementById('add-modal') as HTMLElement;
     const dateInput = document.getElementById('add-date') as HTMLInputElement;
-    dateInput.value = new Date().toISOString().substring(0, 10);
+    // ローカルタイムゾーンに基づいた YYYY-MM-DD 形式の日付をセット
+    dateInput.value = new Date().toLocaleDateString('sv-SE');
     modal.hidden = false;
   }
 
@@ -1597,11 +1598,31 @@ import { SITE_TITLE } from '../consts';
     const amountVal = parseFloat((document.getElementById('add-amount') as HTMLInputElement).value);
     const catVal = (document.getElementById('add-category') as HTMLSelectElement).value;
 
-    if (!dateVal || !storeVal || isNaN(amountVal) || amountVal <= 0) return;
+    // バリデーションチェックと分かりやすい日本語での警告
+    if (!dateVal) {
+      alert('日付を入力してください。');
+      return;
+    }
+
+    const parsedDate = new Date(dateVal);
+    if (isNaN(parsedDate.getTime())) {
+      alert('有効な日付を入力してください。');
+      return;
+    }
+
+    if (!storeVal) {
+      alert('店舗名 / 内容を入力してください。');
+      return;
+    }
+
+    if (isNaN(amountVal) || amountVal <= 0) {
+      alert('金額には1以上の数値を入力してください。');
+      return;
+    }
 
     const newTx: Transaction = {
-      id: `manual_${new Date(dateVal).getTime()}_${Math.random()}`,
-      date: new Date(dateVal),
+      id: `manual_${parsedDate.getTime()}_${Math.random()}`,
+      date: parsedDate,
       store: storeVal,
       amount: amountVal,
       category: catVal,
