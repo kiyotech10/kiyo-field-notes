@@ -54,31 +54,6 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 				<div id="search-results" class="search-results" hidden></div>
 			</div>
 
-			<!-- Featured -->
-			{featuredPosts.length > 0 && (
-				<section class="section" id="featured-section">
-					<h2 class="section-label">Featured</h2>
-					<div class="featured-grid">
-						{featuredPosts.map((post) => (
-							<a href={`/${post.category}/${post.id}/`} class="featured-card">
-								<div class="card-thumb">
-									<ArticleThumb title={post.data.title} category={post.category} size="large" />
-								</div>
-								<div class="card-body">
-									<span class="card-cat">{post.category}</span>
-									<h3 class="card-title">{post.data.title}</h3>
-									<div class="card-footer">
-										<time class="card-date"><FormattedDate date={post.data.pubDate} /></time>
-										{(post.data.tags ?? []).slice(0, 2).map((tag) => (
-											<a href={`/tags/${tag}/`} class="tag-chip" onclick="event.stopPropagation()">#{tag}</a>
-										))}
-									</div>
-								</div>
-							</a>
-						))}
-					</div>
-				</section>
-			)}
 
 			<!-- Recent -->
 			<section class="section" id="recent-section">
