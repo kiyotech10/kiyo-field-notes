@@ -251,14 +251,14 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 		display: flex;
 		align-items: center;
 		gap: 0.8em;
-		margin-bottom: 3.5em; /* Expanded margin for whitespace */
+		margin-bottom: 2em; /* Restored original margin */
 	}
 	.intro-tagline {
-		font-size: 0.85em;
+		font-size: 0.82em;
 		color: var(--text-muted);
 		margin: 0;
-		letter-spacing: 0.08em;
-		font-weight: 600;
+		letter-spacing: 0.05em;
+		font-weight: 500;
 		text-transform: uppercase;
 	}
 	.ai-badge {
@@ -281,7 +281,7 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 
 	/* Search */
 	.search-wrap {
-		margin-bottom: 4.8em; /* Expanded for high-breathability */
+		margin-bottom: 3.5em; /* Restored original margin */
 		position: relative;
 	}
 	.search-box {
@@ -398,17 +398,16 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 	}
 
 	/* Section */
-	.section { margin-bottom: 5.5em; } /* 30%+ Expanded margin for luxurious whitespace */
+	.section { margin-bottom: 4em; } /* Restored original margin */
 	.section-label {
-		font-family: var(--font-heading);
-		font-size: 0.8em;
+		font-size: 0.72em;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
 		color: var(--text-muted);
 		font-weight: 600;
-		margin: 0 0 2.2em; /* Expanded margins */
+		margin: 0 0 1.6em; /* Restored original margin */
 		border-bottom: 1px solid var(--border);
-		padding-bottom: 1em; /* Expanded padding */
+		padding-bottom: 0.8em; /* Restored original padding */
 	}
 
 	/* Featured grid */
@@ -478,8 +477,8 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 	.filter-bar {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.7em;
-		margin-bottom: 2.5em; /* Expanded margins */
+		gap: 0.6em;
+		margin-bottom: 1.8em; /* Restored original margin */
 	}
 	.filter-btn {
 		font-size: 0.72em;
