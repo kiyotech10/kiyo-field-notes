@@ -21,16 +21,19 @@ import HeaderLink from './HeaderLink.astro';
 
 <style>
 	header {
-		border-bottom: 1px solid var(--border);
-		background: var(--bg);
 		position: sticky;
 		top: 0;
 		z-index: 100;
+		background: rgba(248, 249, 250, 0.85); /* Semitransparent background matching --bg */
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Hairline transparent separator */
+		transition: background-color 0.3s ease;
 	}
 	.header-inner {
 		width: 100%;
 		padding: 0 max(1.5rem, 4vw);
-		height: 52px;
+		height: 56px;
 		display: flex;
 		align-items: center;
 		gap: 2.5rem;
@@ -38,12 +41,13 @@ import HeaderLink from './HeaderLink.astro';
 	.site-title {
 		font-family: var(--font-heading);
 		font-size: 0.82em;
-		font-weight: 500;
-		letter-spacing: 0.06em;
+		font-weight: 600;
+		letter-spacing: 0.08em;
 		color: var(--text);
 		text-decoration: none;
 		text-transform: uppercase;
 		white-space: nowrap;
+		transition: var(--transition-google);
 	}
 	.site-title:hover {
 		color: var(--accent);
@@ -57,30 +61,55 @@ import HeaderLink from './HeaderLink.astro';
 	}
 	nav :global(a) {
 		font-size: 0.72em;
-		letter-spacing: 0.1em;
+		letter-spacing: 0.08em;
 		text-transform: uppercase;
 		color: var(--text-muted);
 		text-decoration: none;
-		transition: color 0.15s;
-		font-weight: 400;
+		transition: var(--transition-google);
+		font-weight: 500;
+		position: relative;
+		padding: 0.3rem 0;
 	}
-	nav :global(a:hover),
-	nav :global(a.active) {
+	nav :global(a::after) {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 2px;
+		background-color: var(--accent);
+		transform: scaleX(0);
+		transform-origin: right;
+		transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+		border-radius: 999px;
+	}
+	nav :global(a:hover) {
 		color: var(--text);
-		text-decoration: none;
+	}
+	nav :global(a:hover::after) {
+		transform: scaleX(1);
+		transform-origin: left;
+	}
+	nav :global(a.active) {
+		color: var(--accent);
+		font-weight: 600;
+	}
+	nav :global(a.active::after) {
+		transform: scaleX(1);
+		background-color: var(--accent);
 	}
 	@media (max-width: 720px) {
 		.header-inner {
-			padding: 0 1rem;
+			padding: 0 1.2rem;
 			height: auto;
 			flex-direction: column;
 			align-items: flex-start;
-			gap: 0;
-			padding-top: 0.8rem;
-			padding-bottom: 0.8rem;
+			gap: 0.4rem;
+			padding-top: 1rem;
+			padding-bottom: 1rem;
 		}
 		nav {
-			gap: 0 1.2rem;
+			gap: 0.6rem 1.2rem;
 		}
 	}
 </style>

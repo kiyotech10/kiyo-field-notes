@@ -54,28 +54,31 @@ const today = new Date();
 		position: fixed;
 		bottom: 2rem;
 		right: 2rem;
-		width: 44px;
-		height: 44px;
+		width: 48px;
+		height: 48px;
 		border-radius: 50%;
 		background: var(--accent);
 		color: #fff;
 		border: none;
 		cursor: pointer;
-		font-size: 1.1em;
-		line-height: 1;
+		font-size: 1.2em;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		opacity: 0;
-		transform: translateY(12px);
-		transition: opacity 0.3s, transform 0.3s, background 0.2s;
+		transform: scale(0.8) translateY(16px);
+		transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s;
 		pointer-events: none;
 		z-index: 200;
-		box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+		box-shadow: 0 4px 16px rgba(0,0,0,0.12);
 	}
 	#back-to-top.visible {
 		opacity: 1;
-		transform: translateY(0);
+		transform: scale(1) translateY(0);
 		pointer-events: all;
 	}
 	#back-to-top:hover {
 		background: var(--accent-light);
+		box-shadow: 0 6px 20px rgba(0,0,0,0.18);
 	}
 </style>

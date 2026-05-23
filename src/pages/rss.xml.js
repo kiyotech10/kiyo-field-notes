@@ -3,12 +3,13 @@ import rss from '@astrojs/rss';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 export async function GET(context) {
-	const [diary, english, study, reading, nursing] = await Promise.all([
+	const [diary, english, study, reading, nursing, lifehack] = await Promise.all([
 		getCollection('diary'),
 		getCollection('english'),
 		getCollection('study'),
 		getCollection('reading'),
 		getCollection('nursing'),
+		getCollection('lifehack'),
 	]);
 
 	const allPosts = [
@@ -17,6 +18,7 @@ export async function GET(context) {
 		...study.map((p) => ({ ...p, category: 'study' })),
 		...reading.map((p) => ({ ...p, category: 'reading' })),
 		...nursing.map((p) => ({ ...p, category: 'nursing' })),
+		...lifehack.map((p) => ({ ...p, category: 'lifehack' })),
 	].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 	return rss({
