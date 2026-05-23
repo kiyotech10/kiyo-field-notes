@@ -97,9 +97,6 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 					{recentPosts.map((post) => (
 						<li class="fade-in" data-category={post.category}>
 							<a href={`/${post.category}/${post.id}/`} class="post-row">
-								<div class="post-thumb">
-									<ArticleThumb title={post.data.title} category={post.category} />
-								</div>
 								<div class="post-info">
 									<span class="post-cat">{post.category}</span>
 									<span class="post-title">{post.data.title}</span>
@@ -520,14 +517,11 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 	}
 	.post-list li:first-child { border-top: 1px solid var(--border); }
 	.post-row {
-		display: grid;
-		grid-template-columns: 100px 1fr; /* Expanded from 88px for better image balance */
-		gap: 1.5em;
-		padding: 1.2em 1em;
+		display: block; /* Removed grid to enable seamless full-width minimalist text layout */
+		padding: 1.5em 1em;
 		margin: 0 -1em; /* Negative margin to expand list row beautifully */
 		text-decoration: none;
 		color: var(--text);
-		align-items: flex-start; /* Top alignment to prevent drifting when text expands */
 		border-radius: 20px;
 		transition: var(--transition-google);
 	}
@@ -537,14 +531,7 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 		border-color: rgba(0,0,0,0);
 	}
 	.post-row:hover .post-title { color: var(--accent); }
-	.post-row:hover .post-thumb {
-		transform: scale(1.02);
-	}
-	.post-thumb {
-		border-radius: 12px;
-		overflow: hidden;
-		transition: var(--transition-google);
-	}
+	/* post-thumb style removed for minimalist text list */
 	.post-info {
 		display: flex;
 		flex-direction: column;
@@ -626,11 +613,8 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 			gap: 1.2rem;
 		}
 		.post-row {
-			grid-template-columns: 84px 1fr; /* Optimized mobile thumbnail size */
-			gap: 1em;
-			padding: 1em 0.6em;
+			padding: 1.2em 0.6em;
 			margin: 0 -0.6em;
-			align-items: flex-start; /* Consistent top alignment on mobile */
 		}
 	}
 </style>
