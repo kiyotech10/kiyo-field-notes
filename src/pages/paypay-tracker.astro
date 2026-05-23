@@ -997,8 +997,16 @@ import { SITE_TITLE } from '../consts';
   function loadData() {
     const txRaw = localStorage.getItem(LS_TX);
     if (txRaw) {
-      const parsed = JSON.parse(txRaw) as Array<Transaction & { date: string }>;
-      transactions = parsed.map(t => ({ ...t, date: new Date(t.date), source: t.source ?? '' }));
+      try {
+        const parsed = JSON.parse(txRaw) as Array<Transaction & { date: string }>;
+        // Invalid Date (不正な日付) を持つレコードを除外して安全に読み込む
+        transactions = parsed
+          .map(t => ({ ...t, date: new Date(t.date), source: t.source ?? '' }))
+          .filter(t => !isNaN(t.date.getTime()));
+      } catch (e) {
+        console.error('Failed to parse transactions:', e);
+        transactions = [];
+      }
     }
     const budRaw = localStorage.getItem(LS_BUD);
     if (budRaw) budgets = JSON.parse(budRaw);
@@ -1692,9 +1700,16 @@ import { SITE_TITLE } from '../consts';
     loadData();
 
     if (transactions.length > 0) {
-      selectedMonth = formatMonth(transactions[0].date);
-      showApp();
-      renderAll();
+      // 念のため、有効な日付を持つ最初のトランザクションから選択月を特定
+      const validTx = transactions.find(t => t.date && !isNaN(t.date.getTime()));
+      if (validTx) {
+        selectedMonth = formatMonth(validTx.date);
+        showApp();
+        renderAll();
+      } else {
+        selectedMonth = formatMonth(new Date());
+        hideApp();
+      }
     }
 
     // CSV読み込み
