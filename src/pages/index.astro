@@ -32,55 +32,15 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 		<Header />
 		<main>
 
-			<!-- Profile & Intro Section -->
+			<!-- Profile & Intro Section (Simple & Minimal) -->
 			<div class="profile-card">
-				<div class="profile-main">
-					<div class="profile-text">
-						<h1 class="profile-title">はじめまして、Kiyoです。</h1>
-						<p class="profile-desc">
-							医療の現場で男性看護師として働きながら、日々の仕事や学びのプロセスで得た気づきをこの場所に書き留めています。
-							私たちが生きる複雑な日常を、少しだけシンプルに、そして快適にするための「より良く生きる知恵」や「学習の効率化」について綴っています。
-						</p>
-						<div class="profile-philosophy">
-							<h2 class="philosophy-title">「フィールドノート」に込めた想い</h2>
-							<p class="philosophy-desc">
-								フィールドノートとは、観察者や旅人が野外（フィールド）での気づきをその場でリアルタイムに記録する手帳のこと。
-								このブログも同様に、仕事・勉強・日々の暮らしの中での小さな試行錯誤や考えたことを、飾らずにそのまま書き留める場所でありたいと思っています。
-							</p>
-							<p class="philosophy-desc-sub">
-								一人の男性看護師としてのささやかな視点を交えつつ、日常を豊かにする工夫を記録することで、同じように仕事や自己研鑽に励む方へ、そっと寄り添うような小さなヒントになれば幸いです。
-							</p>
-						</div>
-					</div>
-					
-					<div class="profile-sidebar">
-						<div class="quick-profile">
-							<h3 class="sidebar-title">Profile</h3>
-							<div class="profile-avatar">
-								<span class="avatar-emoji">🩵</span>
-								<div class="avatar-info">
-									<span class="avatar-name">Kiyo</span>
-									<span class="avatar-title">男性看護師 / ブロガー</span>
-								</div>
-							</div>
-							<ul class="profile-details">
-								<li>
-									<span class="detail-label">職業</span>
-									<span class="detail-value">男性看護師</span>
-								</li>
-								<li>
-									<span class="detail-label">関心</span>
-									<span class="detail-value">学びの効率化、ライフハック、語学学習、ヘルスケアの未来</span>
-								</li>
-								<li>
-									<span class="detail-label">モットー</span>
-									<span class="detail-value">複雑な日常を、少しだけシンプルに、快適に。</span>
-								</li>
-							</ul>
-							<div class="intro-badges">
-								<span class="ai-badge">AIによる執筆</span>
-							</div>
-						</div>
+				<div class="profile-content">
+					<h1 class="profile-title">はじめまして、Kiyoです。</h1>
+					<p class="profile-desc">
+						医療分野で働く男性看護師です。日々の仕事や学びのプロセスで得た「より良く生きるための知恵」や「学習の効率化」について発信しています。
+					</p>
+					<div class="intro-badges">
+						<span class="ai-badge">AIによる執筆</span>
 					</div>
 				</div>
 				
@@ -273,37 +233,33 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 </script>
 
 <style>
-	/* Profile Card (Self-Introduction) */
+	/* Profile Card (Simple & Minimal) */
 	.profile-card {
 		--bg-wave-1: #d5e6e3;
 		--bg-wave-2: #faf8f5; /* Seamlessly matches the warm sand white blog background */
 		position: relative;
 		overflow: hidden;
-		padding: 3.2em 3em 5.5em;
+		padding: 2.8em 2.5em 5em;
 		border-radius: 32px;
 		background: linear-gradient(135deg, #eef6f5 0%, #e6f0f3 100%);
 		border: 1px solid rgba(210, 230, 227, 0.4);
 		box-shadow: 0 10px 35px rgba(30, 58, 52, 0.015);
 		margin-bottom: 3.5em;
 	}
-	.profile-main {
-		display: flex;
-		gap: 3.5em;
+	.profile-content {
 		position: relative;
 		z-index: 5;
-	}
-	.profile-text {
-		flex: 1.4;
+		max-width: 680px; /* Limits the reading width beautifully */
 		display: flex;
 		flex-direction: column;
-		gap: 1.3em;
+		gap: 1em;
 	}
 	.profile-title {
-		font-size: 1.75em;
+		font-size: 1.6em;
 		font-family: var(--font-heading);
 		color: #1a3530;
 		font-weight: 700;
-		margin: 0 0 0.2em;
+		margin: 0;
 		letter-spacing: -0.01em;
 	}
 	.profile-desc {
@@ -312,126 +268,8 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 		color: #435853;
 		margin: 0;
 	}
-	.profile-philosophy {
-		border-top: 1px solid rgba(26, 53, 48, 0.06);
-		padding-top: 1.5em;
-		margin-top: 0.4em;
-		display: flex;
-		flex-direction: column;
-		gap: 0.8em;
-	}
-	.philosophy-title {
-		font-size: 1.1em;
-		font-family: var(--font-heading);
-		color: #1a3530;
-		font-weight: 700;
-		margin: 0;
-	}
-	.philosophy-desc {
-		font-size: 0.9em;
-		line-height: 1.75;
-		color: #556b66;
-		margin: 0;
-	}
-	.philosophy-desc-sub {
-		font-size: 0.85em;
-		line-height: 1.7;
-		color: #6e8580;
-		font-style: italic;
-		margin: 0;
-	}
-	
-	.profile-sidebar {
-		flex: 0.8;
-		min-width: 260px;
-	}
-	.quick-profile {
-		background: rgba(255, 255, 255, 0.65);
-		backdrop-filter: blur(12px);
-		-webkit-backdrop-filter: blur(12px);
-		padding: 1.8em;
-		border-radius: 24px;
-		border: 1px solid rgba(255, 255, 255, 0.8);
-		box-shadow: 0 8px 32px rgba(30, 58, 52, 0.02);
-		display: flex;
-		flex-direction: column;
-		gap: 1.3em;
-	}
-	.sidebar-title {
-		font-size: 0.72em;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		color: #1a3530;
-		font-weight: 700;
-		margin: 0;
-		border-bottom: 1px solid rgba(26, 53, 48, 0.06);
-		padding-bottom: 0.6em;
-	}
-	.profile-avatar {
-		display: flex;
-		align-items: center;
-		gap: 0.9em;
-	}
-	.avatar-emoji {
-		font-size: 2.2em;
-		background: #dbeef0;
-		width: 52px;
-		height: 52px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 50%;
-		box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
-	}
-	.avatar-info {
-		display: flex;
-		flex-direction: column;
-		gap: 0.1em;
-	}
-	.avatar-name {
-		font-size: 1.05em;
-		font-weight: 700;
-		color: #1a3530;
-	}
-	.avatar-title {
-		font-size: 0.75em;
-		color: #6e8580;
-		font-weight: 500;
-	}
-	.profile-details {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 0.9em;
-	}
-	.profile-details li {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25em;
-		border-bottom: 1px dashed rgba(26, 53, 48, 0.06);
-		padding-bottom: 0.7em;
-	}
-	.profile-details li:last-child {
-		border-bottom: none;
-		padding-bottom: 0;
-	}
-	.detail-label {
-		font-size: 0.68em;
-		letter-spacing: 0.06em;
-		color: #8fa5a0;
-		font-weight: 600;
-		text-transform: uppercase;
-	}
-	.detail-value {
-		font-size: 0.85em;
-		color: #384c47;
-		font-weight: 500;
-		line-height: 1.45;
-	}
 	.intro-badges {
-		margin-top: 0.3em;
+		margin-top: 0.4em;
 		display: flex;
 		justify-content: flex-start;
 	}
@@ -459,7 +297,7 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 		bottom: -1px;
 		left: 0;
 		width: 100%;
-		height: 90px;
+		height: 80px;
 		z-index: 1;
 		pointer-events: none;
 	}
@@ -469,21 +307,13 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 		display: block;
 	}
 
-	@media (max-width: 800px) {
+	@media (max-width: 600px) {
 		.profile-card {
-			padding: 2.2em 2em 4.5em;
+			padding: 2.2em 1.8em 4.2em;
 			border-radius: 24px;
 		}
-		.profile-main {
-			flex-direction: column;
-			gap: 2.2em;
-		}
-		.profile-sidebar {
-			width: 100%;
-			min-width: 100%;
-		}
 		.profile-wave {
-			height: 60px;
+			height: 55px;
 		}
 	}
 
