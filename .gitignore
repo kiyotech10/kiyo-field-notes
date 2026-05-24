@@ -26,6 +26,3 @@ pnpm-debug.log*
 # Claude Code memory
 .claude/
 .vercel
-
-# Keep PayPay Tracker local-only (never commit/deploy to the web)
-src/pages/paypay-tracker.astro
