@@ -244,8 +244,7 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 		background: linear-gradient(135deg, #eef6f5 0%, #e6f0f3 100%);
 		border: 1px solid rgba(210, 230, 227, 0.4);
 		box-shadow: 0 10px 35px rgba(30, 58, 52, 0.015);
-		max-width: 820px; /* Limits width beautifully on ultrawide screens */
-		margin: 0 auto 4.5em; /* Centered with generous bottom spacing */
+		margin-bottom: 4.5em; /* Perfectly aligned full width, generous bottom spacing */
 	}
 	.profile-content {
 		position: relative;
@@ -320,8 +319,7 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 
 	/* Search */
 	.search-wrap {
-		max-width: 600px; /* Slim search bar centered elegantly */
-		margin: 0 auto 5em; /* Deep breathing space below */
+		margin-bottom: 5em; /* Deep breathing space below, aligned to full grid width */
 		position: relative;
 	}
 	.search-box {
