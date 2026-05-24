@@ -70,19 +70,19 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 				</div>
 				<ul class="post-list">
 					{recentPosts.map((post) => (
-						<li class="fade-in" data-category={post.category}>
-							<a href={`/${post.category}/${post.id}/`} class="post-row">
+						<li class="fade-in post-item" data-category={post.category}>
+							<div class="post-row">
 								<div class="post-info">
 									<span class="post-cat">{post.category}</span>
-									<span class="post-title">{post.data.title}</span>
+									<a href={`/${post.category}/${post.id}/`} class="post-title-link">{post.data.title}</a>
 									<div class="post-meta">
 										<time class="post-date"><FormattedDate date={post.data.pubDate} /></time>
 										{(post.data.tags ?? []).slice(0, 3).map((tag) => (
-											<a href={`/tags/${tag}/`} class="tag-chip" onclick="event.stopPropagation()">#{tag}</a>
+											<a href={`/tags/${tag}/`} class="tag-chip">#{tag}</a>
 										))}
 									</div>
 								</div>
-							</a>
+							</div>
 						</li>
 					))}
 				</ul>
@@ -486,27 +486,28 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 		display: flex;
 		flex-direction: column;
 	}
-	.post-list li {
+	.post-item {
+		position: relative; /* Criteria point for absolute stretched link */
 		border-bottom: 1px solid var(--border);
 		transition: var(--transition-google);
 	}
-	.post-list li:first-child { border-top: 1px solid var(--border); }
+	.post-item:first-child { border-top: 1px solid var(--border); }
+	
 	.post-row {
-		display: block; /* Removed grid to enable seamless full-width minimalist text layout */
+		display: block;
 		padding: 1.5em 1em;
-		margin: 0 -1em; /* Negative margin to expand list row beautifully */
-		text-decoration: none;
-		color: var(--text);
+		margin: 0 -1em;
 		border-radius: 20px;
 		transition: var(--transition-google);
 	}
 	.post-row:hover {
 		background: #ffffff;
 		box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-		border-color: rgba(0,0,0,0);
 	}
-	.post-row:hover .post-title { color: var(--accent); }
-	/* post-thumb style removed for minimalist text list */
+	.post-row:hover .post-title-link {
+		color: var(--accent);
+	}
+	
 	.post-info {
 		display: flex;
 		flex-direction: column;
@@ -519,23 +520,38 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 		color: var(--accent);
 		font-weight: 700;
 	}
-	.post-title {
+	.post-title-link {
 		font-size: 0.95em;
 		font-weight: 600;
 		line-height: 1.45;
 		letter-spacing: -0.01em;
+		color: var(--text);
+		text-decoration: none;
 		transition: var(--transition-google);
+	}
+	/* Stretched link to make the entire row clickable safely without nesting <a> tags */
+	.post-title-link::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 1;
 	}
 	.post-meta {
 		display: flex;
 		align-items: center;
 		gap: 0.6em;
 		flex-wrap: wrap;
+		margin-top: 0.25em;
 	}
 	.post-date {
 		font-size: 0.72em;
 		color: var(--text-muted);
-		white-space: nowrap; /* Prevent date characters like '日' from wrapping to the next line */
+		white-space: nowrap;
+		position: relative;
+		z-index: 2; /* Put date above the stretched link */
 	}
 
 	/* Tag chips (shared) */
@@ -544,11 +560,13 @@ const allTags = [...new Set(allPosts.flatMap((p) => p.data.tags ?? []))].sort();
 		color: var(--text-muted);
 		text-decoration: none;
 		border: 1px solid #dadce0;
-		border-radius: 999px; /* Pill chip */
+		border-radius: 999px;
 		padding: 0.2em 0.7em;
 		background: #ffffff;
 		transition: var(--transition-google);
 		white-space: nowrap;
+		position: relative;
+		z-index: 2; /* Put tags above the stretched link to ensure they are separately clickable */
 	}
 	.tag-chip:hover {
 		color: var(--accent);
