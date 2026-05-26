@@ -1,6 +1,6 @@
 ---
-// Antigravity Ethos - Dynamic NurseNotes Upgrade
-// Automatically generated via Gemini Stitch compiler
+// Antigravity Ethos - Clean Website Update
+// Rendered exactly matching the user's designed HTML layout
 ---
 <!DOCTYPE html>
 <html lang="ja">
@@ -8,13 +8,10 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>見ぬもの清し (Kiyo Field Notes) - NurseNotes</title>
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Google Material Symbols -->
+    <script is:inline src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS (for embedded blog simulator structure compatibility) -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
+    <script is:inline id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
         theme: {
@@ -106,12 +103,11 @@
         },
       }
     </script>
-    <style>
+<style>
         body {
             background-color: #F8FAFB;
             color: #1A1C1E;
             -webkit-font-smoothing: antialiased;
-            font-family: 'Inter', 'Noto Sans JP', sans-serif;
         }
         .glass-card {
             background: rgba(255, 255, 255, 0.7);
@@ -141,470 +137,202 @@
             outline: none;
             box-shadow: 0 0 0 4px rgba(39, 97, 131, 0.1);
         }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        
-        /* Audio visualizer animations */
-        .waveform-bars {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            height: 16px;
-        }
-        .bar {
-            width: 2px;
-            height: 4px;
-            background: #276183;
-            border-radius: 9999px;
-            animation: bounce-bar 0.8s infinite alternate ease-in-out;
-        }
-        .bar:nth-child(2) { animation-delay: 0.15s; }
-        .bar:nth-child(3) { animation-delay: 0.3s; }
-        .bar:nth-child(4) { animation-delay: 0.45s; }
-        .bar:nth-child(5) { animation-delay: 0.6s; }
-        @keyframes bounce-bar {
-            0% { height: 4px; }
-            100% { height: 16px; }
-        }
-
-        /* Float elements standard transition */
-        .floating-audio-panel {
-            animation: slide-up-panel 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-        }
-        @keyframes slide-up-panel {
-            0% { transform: translateY(30px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-
-        /* Bubble animations */
-        #chat-messages-container div {
-            animation: pop-bubble 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            transform-origin: left bottom;
-        }
-        @keyframes pop-bubble {
-            0% { transform: scale(0.85); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        /* VIP Locker card logic styling */
-        .vip-lock-overlay {
-            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .vip-lock-overlay.unlocked {
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(-20px);
-        }
     </style>
 </head>
 <body class="font-body-md text-body-md">
-    
-    <!-- TopNavBar -->
-    <header class="fixed top-0 w-full z-50 bg-surface-glass backdrop-blur-xl border-b border-border-subtle shadow-[0px_10px_40px_rgba(0,0,0,0.04)]">
-        <div class="max-w-container-max mx-auto px-gutter flex justify-between items-center h-16">
-            <a class="font-headline-md text-headline-md text-primary tracking-tight font-bold" href="/">NurseNotes</a>
-            <nav class="hidden md:flex space-x-6">
-                <a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/diary">Diary</a>
-                <a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/study">Study</a>
-                <a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/nursing">Nursing</a>
-                <a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/lifehack">Lifehack</a>
-                <a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/reading">Reading</a>
-                <a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/about">About</a>
-            </nav>
-            <div class="flex items-center gap-4">
-                <div class="relative hidden sm:block">
-                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-[20px]">search</span>
-                    <input class="well-input pl-10 pr-4 py-1.5 rounded-full text-body-md w-48 focus:w-64" placeholder="Search..." type="text">
-                </div>
-                <!-- Dynamic Auth Header container -->
-                <div id="header-auth-container">
-                    <button id="auth-main-btn" class="bg-primary text-on-primary px-5 py-2 rounded-full font-label-sm text-label-sm hover:scale-105 hover:shadow-lg transition-all duration-300 flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm">login</span>
-                        Sign In
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main class="pt-32 pb-stack-lg px-margin-mobile md:px-gutter max-w-container-max mx-auto">
-        <!-- Hero Section -->
-        <section class="mb-stack-lg relative">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-                <div class="md:col-span-8">
-                    <h1 class="font-headline-lg text-headline-lg mb-stack-md text-primary">はじめまして、Kiyoです。</h1>
-                    <p class="font-body-lg text-body-lg text-text-secondary leading-relaxed mb-stack-md max-w-2xl">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface-glass backdrop-blur-xl border-b border-border-subtle shadow-[0px_10px_40px_rgba(0,0,0,0.04)]">
+<div class="max-w-container-max mx-auto px-gutter flex justify-between items-center h-16">
+<a class="font-headline-md text-headline-md text-primary tracking-tight font-bold" href="/">NurseNotes</a>
+<nav class="hidden md:flex space-x-6">
+<a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/diary">Diary</a>
+<a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/study">Study</a>
+<a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/nursing">Nursing</a>
+<a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/lifehack">Lifehack</a>
+<a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/reading">Reading</a>
+<a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/about">About</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-[20px]">search</span>
+<input class="well-input pl-10 pr-4 py-1.5 rounded-full text-body-md w-48 focus:w-64" placeholder="Search..." type="text">
+</div>
+<button class="bg-primary text-on-primary px-5 py-2 rounded-full font-label-sm text-label-sm hover:scale-105 hover:shadow-lg transition-all duration-300">Contact</button>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-stack-lg px-margin-mobile md:px-gutter max-w-container-max mx-auto">
+<!-- Hero Section -->
+<section class="mb-stack-lg relative">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+<div class="md:col-span-8">
+<h1 class="font-headline-lg text-headline-lg mb-stack-md text-primary">はじめまして、Kiyoです。</h1>
+<p class="font-body-lg text-body-lg text-text-secondary leading-relaxed mb-stack-md max-w-2xl">
                         医療分野で働く男性看護師です。日々の仕事や学びのプロセスで得た「より良く生きるための知恵」や「学習の効率化」について発信しています。
                     </p>
-                    <div class="flex items-center gap-3">
-                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm shadow-[0_2px_8px_rgba(39,97,131,0.08)]">
-                            <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
-                            Gemini 3.5 Flash 実装
-                            <button class="ml-1 opacity-60 hover:opacity-100 transition-opacity" id="ai-chip-close"><span class="material-symbols-outlined text-[14px]">close</span></button>
-                        </div>
-                    </div>
-                </div>
-                <div class="md:col-span-4 hidden md:block">
-                    <div class="aspect-square rounded-full glass-card overflow-hidden p-2 shadow-inner border border-black/5">
-                        <img alt="Kiyo Profile" class="w-full h-full object-cover rounded-full" src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=350&q=80">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Categories Filter -->
-        <nav class="mb-stack-md flex flex-wrap gap-2">
-            <button class="px-6 py-2 rounded-full bg-primary text-on-primary font-label-sm text-label-sm shadow-lg hover:scale-103 transition-transform">All</button>
-            <a href="/diary" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Diary</a>
-            <a href="/english" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">English</a>
-            <a href="/study" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Study</a>
-            <a href="/reading" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Reading</a>
-            <a href="/nursing" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Nursing</a>
-            <a href="/lifehack" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Lifehack</a>
-        </nav>
-
-        <!-- Articles Bento Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
-            <!-- Featured Card (Lifehack forest path) -->
-            <article class="lg:col-span-2 glass-card rounded-xl p-8 antigravity-float flex flex-col justify-between" id="article-featured">
-                <div>
-                    <div class="flex justify-between items-start mb-6">
-                        <span class="px-3 py-1 rounded bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">LIFEHACK</span>
-                        <span class="text-text-secondary font-label-sm text-label-sm">2026年5月25日</span>
-                    </div>
-                    <h2 class="font-headline-lg text-headline-lg mb-4 text-text-primary">頑張りすぎると病気になる——Utsuさんの活動休止と、自然に沿った生き方</h2>
-                    <div class="flex flex-wrap gap-2 mb-6">
-                        <span class="text-primary font-label-sm text-label-sm">#健康</span>
-                        <span class="text-primary font-label-sm text-label-sm">#生き方</span>
-                        <span class="text-primary font-label-sm text-label-sm">#仕事</span>
-                    </div>
-                </div>
-                <div class="w-full h-64 rounded-lg overflow-hidden mt-4 relative">
-                    <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80" alt="serene landscape">
-                </div>
-                <!-- Dynamic text-to-speech button injected by Stitch -->
-                <div class="mt-4 pt-3 border-t border-black/[0.03] flex items-center justify-between">
-                    <button class="speech-listen-btn flex items-center gap-1.5 text-xs font-bold text-primary hover:opacity-85">
-                        <span class="material-symbols-outlined text-sm text-teal-600">spatial_audio</span>
-                        AI 朗読で記事を聞く
-                    </button>
-                </div>
-            </article>
-
-            <!-- Card 2: DX Acute care with Dynamic map insert -->
-            <article class="glass-card rounded-xl p-6 antigravity-float flex flex-col justify-between" id="article-dx">
-                <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="px-3 py-1 rounded bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm">NURSING</span>
-                        <span class="text-text-secondary font-label-sm text-label-sm">2026年5月24日</span>
-                    </div>
-                    <h3 class="font-headline-md text-headline-md mb-3 text-text-primary">【令和8年度改定】医療DXによる急性期看護配置基準の柔軟化と現場への影響</h3>
-                    <div class="flex flex-wrap gap-2 my-2 text-xs text-text-secondary">
-                        <span>#DX</span>
-                        <span>#医療情勢</span>
-                    </div>
-
-                    <!-- Maps injection slot -->
-                    <div class="mt-3 bg-white/90 border border-black/[0.05] rounded-xl p-3 flex flex-col gap-2">
-                        <div class="flex justify-between items-center text-[10px] text-text-secondary">
-                            <span class="font-bold flex items-center gap-1"><span class="material-symbols-outlined text-xs text-green-500">pin_drop</span>急性期看護DX配置マップ</span>
-                            <span class="text-emerald-600 font-semibold">Active</span>
-                        </div>
-                        <div class="w-full h-28 rounded-lg bg-[#cee8e1]/20 border border-emerald-500/10 flex items-center justify-center relative overflow-hidden">
-                            <!-- Mock map styling background -->
-                            <div class="absolute inset-0 opacity-15" style="background-image: radial-gradient(#276183 1px, transparent 1px); background-size: 10px 10px;"></div>
-                            <span class="material-symbols-outlined text-red-500 absolute animate-pulse text-2xl" style="top:25%; left:50%">location_on</span>
-                            <span class="material-symbols-outlined text-[#276183] absolute text-lg" style="top:50%; left:25%">local_hospital</span>
-                            <span class="material-symbols-outlined text-[#276183] absolute text-lg" style="top:15%; left:75%">local_hospital</span>
-                            <div class="absolute bottom-1 right-1 bg-white/80 backdrop-blur px-1.5 py-0.5 rounded text-[8px] text-zinc-600 scale-90 border border-black/5">Google Maps API</div>
-                        </div>
-                        <span class="text-[9px] text-zinc-500">最寄りの改定基準適合・二次救急医療機関: 32施設</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-black/[0.03] flex items-center justify-between">
-                    <button class="speech-listen-btn flex items-center gap-1.5 text-xs font-bold text-primary hover:opacity-85">
-                        <span class="material-symbols-outlined text-sm text-teal-600">spatial_audio</span>
-                        AI 朗読を聞く
-                    </button>
-                </div>
-            </article>
-
-            <!-- VIP Locker Post Card (locked until Auth signed in) -->
-            <article class="glass-card rounded-xl p-6 antigravity-float flex flex-col justify-between relative overflow-hidden" id="article-vip">
-                <div class="vip-lock-overlay absolute inset-0 bg-white/85 backdrop-blur-md z-20 flex flex-col items-center justify-center text-center p-6" id="vip-locker">
-                    <span class="material-symbols-outlined text-3xl text-primary mb-2">lock</span>
-                    <h4 class="font-headline-md text-sm font-bold text-text-primary">読者会員限定コンテンツ</h4>
-                    <p class="text-xs text-text-secondary mt-1.5 max-w-[200px]">
-                        上部の「Sign In」ボタンからログインすると、会員限定の成長フレームワーク記事を閲覧できます。
-                    </p>
-                </div>
-                
-                <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="px-3 py-1 rounded bg-amber-100 text-amber-800 font-label-sm text-label-sm">STUDY</span>
-                        <span class="text-text-secondary font-label-sm text-label-sm">VIP MEMBER</span>
-                    </div>
-                    <h3 class="font-headline-md text-headline-md mb-3 text-text-primary">看護師の成長を10倍に加速する「越境学習」の実践フレームワーク</h3>
-                    <p class="text-text-secondary text-xs leading-relaxed mt-2">
-                        院内だけのキャリアから抜け出し、他分野（IT、語学、経済）での学びを看護業務へ「越境還元」するための3つのステップを完全解説。
-                    </p>
-                </div>
-                <div class="mt-4 pt-3 border-t border-black/[0.03] flex items-center justify-between">
-                    <button class="speech-listen-btn flex items-center gap-1.5 text-xs font-bold text-primary hover:opacity-85">
-                        <span class="material-symbols-outlined text-sm text-teal-600">spatial_audio</span>
-                        AI 朗読を聞く
-                    </button>
-                </div>
-            </article>
-
-            <!-- Card 3 -->
-            <article class="glass-card rounded-xl p-6 antigravity-float flex flex-col justify-between" id="article-nursing">
-                <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="px-3 py-1 rounded bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm">NURSING</span>
-                        <span class="text-text-secondary font-label-sm text-label-sm">2026年5月22日</span>
-                    </div>
-                    <h3 class="font-headline-md text-headline-md mb-3 text-text-primary">「看護師になること」を目標にしてはいけない</h3>
-                    <div class="mt-auto pt-4 flex flex-wrap gap-2 text-xs text-text-secondary">
-                        <span class="text-text-secondary font-label-sm text-label-sm">#キャリア</span>
-                        <span class="text-text-secondary font-label-sm text-label-sm">#目標設定</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-black/[0.03] flex items-center justify-between">
-                    <button class="speech-listen-btn flex items-center gap-1.5 text-xs font-bold text-primary hover:opacity-85">
-                        <span class="material-symbols-outlined text-sm text-teal-600">spatial_audio</span>
-                        AI 朗読を聞く
-                    </button>
-                </div>
-            </article>
-
-            <!-- Card 4 -->
-            <article class="glass-card rounded-xl p-6 antigravity-float flex flex-col justify-between" id="article-invest">
-                <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="px-3 py-1 rounded bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">LIFEHACK</span>
-                        <span class="text-text-secondary font-label-sm text-label-sm">2026年5月20日</span>
-                    </div>
-                    <h3 class="font-headline-md text-headline-md mb-3 text-text-primary">オルカンで投資をはじめた。月10万円、夫婦で積み立てるだけ</h3>
-                    <div class="mt-auto pt-4 flex flex-wrap gap-2 text-xs text-text-secondary">
-                        <span class="text-text-secondary font-label-sm text-label-sm">#投資</span>
-                        <span class="text-text-secondary font-label-sm text-label-sm">#資産形成</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-black/[0.03] flex items-center justify-between">
-                    <button class="speech-listen-btn flex items-center gap-1.5 text-xs font-bold text-primary hover:opacity-85">
-                        <span class="material-symbols-outlined text-sm text-teal-600">spatial_audio</span>
-                        AI 朗読を聞く
-                    </button>
-                </div>
-            </article>
-
-            <!-- Card 5 -->
-            <article class="glass-card rounded-xl p-6 antigravity-float flex flex-col justify-between" id="article-starbucks">
-                <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="px-3 py-1 rounded bg-surface-variant text-on-surface-variant font-label-sm text-label-sm">DIARY</span>
-                        <span class="text-text-secondary font-label-sm text-label-sm">2026年5月19日</span>
-                    </div>
-                    <h3 class="font-headline-md text-headline-md mb-3 text-text-primary">沖縄のスターバックスとシーサー</h3>
-                    <div class="mt-auto pt-4 flex flex-wrap gap-2 text-xs text-text-secondary">
-                        <span class="text-text-secondary font-label-sm text-label-sm">#旅行</span>
-                        <span class="text-text-secondary font-label-sm text-label-sm">#カフェ</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-black/[0.03] flex items-center justify-between">
-                    <button class="speech-listen-btn flex items-center gap-1.5 text-xs font-bold text-primary hover:opacity-85">
-                        <span class="material-symbols-outlined text-sm text-teal-600">spatial_audio</span>
-                        AI 朗読を聞く
-                    </button>
-                </div>
-            </article>
-
-            <!-- Card 6: English overhead book study -->
-            <article class="glass-card rounded-xl p-6 antigravity-float flex flex-col lg:col-span-2 justify-between" id="article-english">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full items-center">
-                    <div class="flex flex-col h-full justify-between">
-                        <div>
-                            <div class="flex justify-between items-start mb-4">
-                                <span class="px-3 py-1 rounded bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm">ENGLISH</span>
-                                <span class="text-text-secondary font-label-sm text-label-sm">2026年5月16日</span>
-                            </div>
-                            <h3 class="font-headline-md text-headline-md mb-3 text-text-primary">TOEIC 905点。でも「英語ができる」は目的じゃない</h3>
-                            <p class="text-text-secondary text-body-md mb-4 leading-relaxed">目標スコア達成後の実務で感じた、言語学習の本質的な価値について振り返ります。</p>
-                        </div>
-                        <div class="flex flex-wrap gap-2 text-xs text-text-secondary">
-                            <span>#TOEIC</span>
-                            <span>#英語学習</span>
-                        </div>
-                    </div>
-                    <div class="hidden md:block rounded-lg overflow-hidden h-48 border border-black/5 shadow-inner">
-                        <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=400&q=80" alt="learning desk">
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-black/[0.03] flex items-center justify-between">
-                    <button class="speech-listen-btn flex items-center gap-1.5 text-xs font-bold text-primary hover:opacity-85">
-                        <span class="material-symbols-outlined text-sm text-teal-600">spatial_audio</span>
-                        AI 朗読を聞く
-                    </button>
-                </div>
-            </article>
-
-            <!-- Card 7 -->
-            <article class="glass-card rounded-xl p-6 antigravity-float flex flex-col justify-between" id="article-books">
-                <div>
-                    <div class="flex justify-between items-start mb-4">
-                        <span class="px-3 py-1 rounded bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">LIFEHACK</span>
-                        <span class="text-text-secondary font-label-sm text-label-sm">2026年5月12日</span>
-                    </div>
-                    <h3 class="font-headline-md text-headline-md mb-3 text-text-primary">Amazonとgeminiで、気になる本の中身を無料でのぞく方法</h3>
-                    <div class="mt-auto pt-4 flex flex-wrap gap-2 text-xs text-text-secondary">
-                        <span class="text-text-secondary font-label-sm text-label-sm">#AI</span>
-                        <span class="text-text-secondary font-label-sm text-label-sm">#読書</span>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-black/[0.03] flex items-center justify-between">
-                    <button class="speech-listen-btn flex items-center gap-1.5 text-xs font-bold text-primary hover:opacity-85">
-                        <span class="material-symbols-outlined text-sm text-teal-600">spatial_audio</span>
-                        AI 朗読を聞く
-                    </button>
-                </div>
-            </article>
-        </div>
-
-        <!-- Categories Section -->
-        <section class="mt-stack-lg border-t border-border-subtle pt-12">
-            <h2 class="font-headline-md text-headline-md mb-8 flex items-center gap-2"><span class="material-symbols-outlined text-primary">grid_view</span>Categories</h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-12">
-                <a class="flex flex-col items-center justify-center p-6 rounded-xl bg-primary-container text-on-primary-container antigravity-float glass-card text-center gap-3" href="/nursing">
-                    <span class="material-symbols-outlined text-3xl">medical_services</span>
-                    <span class="font-headline-md text-sm font-bold">Nursing</span>
-                </a>
-                <a class="flex flex-col items-center justify-center p-6 rounded-xl bg-secondary-container text-on-secondary-container antigravity-float glass-card text-center gap-3" href="/lifehack">
-                    <span class="material-symbols-outlined text-3xl">tips_and_updates</span>
-                    <span class="font-headline-md text-sm font-bold">Lifehack</span>
-                </a>
-                <a class="flex flex-col items-center justify-center p-6 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed-variant antigravity-float glass-card text-center gap-3" href="/english">
-                    <span class="material-symbols-outlined text-3xl">language</span>
-                    <span class="font-headline-md text-sm font-bold">English</span>
-                </a>
-                <a class="flex flex-col items-center justify-center p-6 rounded-xl bg-surface-variant text-on-surface-variant antigravity-float glass-card text-center gap-3" href="/study">
-                    <span class="material-symbols-outlined text-3xl">menu_book</span>
-                    <span class="font-headline-md text-sm font-bold">Study</span>
-                </a>
-                <a class="flex flex-col items-center justify-center p-6 rounded-xl bg-primary-fixed text-on-primary-fixed-variant antigravity-float glass-card text-center gap-3" href="/diary">
-                    <span class="material-symbols-outlined text-3xl">auto_stories</span>
-                    <span class="font-headline-md text-sm font-bold">Diary</span>
-                </a>
-            </div>
-            
-            <div class="border-t border-border-subtle pt-8">
-                <h3 class="font-label-sm text-label-sm text-text-secondary uppercase tracking-widest mb-6">Other Topics</h3>
-                <div class="flex flex-wrap gap-2">
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/AI/">#AI</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/DX/">#DX</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/PayPay/">#PayPay</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/SNS/">#SNS</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/TOEIC/">#TOEIC</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/キャリア/">#キャリア</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/健康/">#健康</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/医療情勢/">#医療情勢</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/将来性/">#将来性</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/投資/">#投資</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/旅行/">#旅行</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/生き方/">#生き方</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/節約/">#節約</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/越境学習/">#越境学習</a>
-                    <a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/資産形成/">#資産形成</a>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="w-full py-12 mt-stack-lg bg-surface-container-lowest border-t border-border-subtle">
-        <div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-                <h2 class="font-headline-md text-headline-md text-primary mb-4">NurseNotes</h2>
-                <p class="font-label-sm text-label-sm text-text-secondary opacity-80 mb-6">© 2026 NurseNotes. Precision in Care, Clarity in Learning.</p>
-                <div class="flex gap-4">
-                    <a class="text-text-secondary hover:text-primary transition-all duration-300" href="#"><span class="material-symbols-outlined">public</span></a>
-                    <a class="text-text-secondary hover:text-primary transition-all duration-300" href="#"><span class="material-symbols-outlined">share</span></a>
-                </div>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <div class="flex flex-col gap-2">
-                    <a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/diary">Diary</a>
-                    <a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/english">English</a>
-                    <a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/study">Study</a>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/reading">Reading</a>
-                    <a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/nursing">Nursing</a>
-                    <a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/lifehack">Lifehack</a>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/about">About</a>
-                    <a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/contact">Contact</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- FAB for quick action: Opens Gemini Live Voice chat -->
-    <button id="chatbot-fab" class="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-primary text-on-primary shadow-xl flex items-center justify-center hover:scale-110 transition-all duration-300 active:scale-95 z-50 animate-bounce-slow">
-        <span class="material-symbols-outlined text-[28px]">forum</span>
-    </button>
-
-    <!-- Floating Audio Speech Player Interface -->
-    <div id="global-speech-player" class="floating-audio-panel fixed bottom-6 left-6 right-6 md:left-auto md:right-8 md:w-[360px] bg-white/95 backdrop-blur-md rounded-2xl p-4 border border-zinc-200 shadow-2xl flex items-center justify-between gap-4 z-50 hidden">
-        <div class="flex items-center gap-3 overflow-hidden flex-1">
-            <button class="w-10 h-10 rounded-full bg-[#276183] text-white flex items-center justify-center flex-shrink-0 hover:scale-105 active:scale-95 transition-transform" id="audio-play-toggle">
-                <span class="material-symbols-outlined text-sm">pause</span>
-            </button>
-            <div class="overflow-hidden">
-                <span class="text-[8px] uppercase font-bold text-[#276183] tracking-widest block">AI Narrator (Kiyo Voice)</span>
-                <span class="text-xs font-bold truncate block text-[#1A1C1E] mt-0.5" id="speech-title">頑張りすぎると病気になる</span>
-            </div>
-        </div>
-        
-        <!-- Animated Wave -->
-        <div class="waveform-bars flex-shrink-0" id="player-wave">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-        </div>
-        <button class="text-zinc-400 hover:text-zinc-600 flex-shrink-0" id="close-audio-player"><span class="material-symbols-outlined text-lg">close</span></button>
-    </div>
-
-    <!-- Floating Chatbot Modal Window -->
-    <div id="global-chat-window" class="fixed bottom-24 right-8 w-[340px] h-[450px] bg-white/95 rounded-2xl shadow-2xl border border-black/[0.05] z-50 flex flex-col backdrop-blur-md hidden transition-all duration-300 transform scale-95 opacity-0">
-        <div class="bg-[#276183] text-white px-4 py-3.5 rounded-t-2xl flex justify-between items-center shadow-sm">
-            <div class="flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-sm">auto_awesome</span>
-                <span class="font-bold text-xs">Gemini Nurse Assistant</span>
-            </div>
-            <button id="close-global-chat" class="hover:opacity-85"><span class="material-symbols-outlined text-sm">close</span></button>
-        </div>
-        <div class="flex-1 p-4 overflow-y-auto space-y-3 text-xs flex flex-col" id="chat-messages-container">
-            <div class="bg-zinc-100 text-zinc-800 p-3 rounded-2xl max-w-[85%] self-start leading-relaxed">
-                こんにちは！Kiyoさんのブログ「NurseNotes」アシスタントです。医療DX配置基準の改定、英語学習のコツ、全世界積立投資、セルフケアなど、ブログ記事の内容や看護知見について何でも質問してくださいね。
-            </div>
-        </div>
-        <div class="p-3 border-t border-black/[0.05] flex gap-2 items-center bg-[#f8fafb] rounded-b-2xl">
-            <input type="text" id="chat-input" class="flex-1 bg-white border border-black/[0.08] px-4 py-2 rounded-full text-xs focus:outline-none focus:border-[#276183]" placeholder="例：英語学習の本質について教えて...">
-            <button id="send-chat" class="bg-[#276183] text-white w-8 h-8 rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-all"><span class="material-symbols-outlined text-sm">send</span></button>
-        </div>
-    </div>
-
-    <script>
+<div class="flex items-center gap-3">
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                            AIによる執筆
+                            <button class="ml-1 opacity-60 hover:opacity-100 transition-opacity" id="ai-chip-close-btn"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</div>
+</div>
+</div>
+<div class="md:col-span-4 hidden md:block">
+<div class="aspect-square rounded-full glass-card overflow-hidden p-2">
+<img alt="Kiyo Profile" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida/ADBb0uiVield4zzxo9HvCZ6adgZ2AjGIlhSlbpC81mLqN0oyauHxItTMrN1fzeh1DpkOAiYcz_C42sBJO10gDZDknH9GeLXwFX_l-gtJZQo5BbXeMxY2IuB3avgInx7pqD5P1XPWJZPWxnXkGd7XGm2lVES02HIJIKfFRIjcrHcHMN2t8gicJ33Z0cIhFxs5PBraCCo6WzH9zERp1bRt3kuswmk9wrGzmyBOzfapdZS5u7E9qtyU_y_YM4zqYz0">
+</div>
+</div>
+</div>
+</section>
+<!-- Categories Filter -->
+<nav class="mb-stack-md flex flex-wrap gap-2">
+<button class="px-6 py-2 rounded-full bg-primary text-on-primary font-label-sm text-label-sm shadow-lg">All</button>
+<button class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Diary</button>
+<button class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">English</button>
+<button class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Study</button>
+<button class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Reading</button>
+<button class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Nursing</button>
+<button class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Lifehack</button>
+</nav>
+<!-- Articles Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Featured Card -->
+<article class="lg:col-span-2 glass-card rounded-xl p-8 antigravity-float flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-6">
+<span class="px-3 py-1 rounded bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">LIFEHACK</span>
+<span class="text-text-secondary font-label-sm text-label-sm">2026年5月25日</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg mb-4 text-text-primary">頑張りすぎると病気になる——Utsuさんの活動休止と、自然に沿った生き方</h2>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="text-primary font-label-sm text-label-sm">#健康</span>
+<span class="text-primary font-label-sm text-label-sm">#生き方</span>
+<span class="text-primary font-label-sm text-label-sm">#仕事</span>
+</div>
+</div>
+<div class="w-full h-48 rounded-lg overflow-hidden mt-4">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvykZUQh3eLqUKi-S8dD1pawCRmatI_JGTN0SBIpmcPn5WxpWQOEooRHeQTCv34dOW_RLbuP1fSKYT6s2KbRWFQRY13G3iY-rna5tk4G5onHbzrdGpd2BONLucI-wzWQzjWPpTALc4oaEGoTkux_e5O7tw7DmDnmo2Dcafbt2FA-m_xRFRxbUOu8bDY8PVUEiY3uIZraEVrfv3q0aVfuxTGodUtacgIH3-Y6zJwoe8IMzlSL_bld-IynMS0k8NTu56q32ioW7ieZie">
+</div>
+</article>
+<!-- Card 2 -->
+<article class="glass-card rounded-xl p-6 antigravity-float flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<span class="px-3 py-1 rounded bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm">NURSING</span>
+<span class="text-text-secondary font-label-sm text-label-sm">2026年5月24日</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">【令和8年度改定】医療DXによる急性期看護配置基準の柔軟化と現場への影響</h3>
+<div class="mt-auto pt-4 flex flex-wrap gap-2 border-t border-border-subtle">
+<span class="text-text-secondary font-label-sm text-label-sm">#DX</span>
+<span class="text-text-secondary font-label-sm text-label-sm">#医療情勢</span>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="glass-card rounded-xl p-6 antigravity-float flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<span class="px-3 py-1 rounded bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm">NURSING</span>
+<span class="text-text-secondary font-label-sm text-label-sm">2026年5月22日</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">「看護師になること」を目標にしてはいけない</h3>
+<div class="mt-auto pt-4 flex flex-wrap gap-2 border-t border-border-subtle">
+<span class="text-text-secondary font-label-sm text-label-sm">#キャリア</span>
+<span class="text-text-secondary font-label-sm text-label-sm">#目標設定</span>
+</div>
+</article>
+<!-- Card 4 -->
+<article class="glass-card rounded-xl p-6 antigravity-float flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<span class="px-3 py-1 rounded bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">LIFEHACK</span>
+<span class="text-text-secondary font-label-sm text-label-sm">2026年5月20日</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">オルカンで投資をはじめた。月10万円、夫婦で積み立てるだけ</h3>
+<div class="mt-auto pt-4 flex flex-wrap gap-2 border-t border-border-subtle">
+<span class="text-text-secondary font-label-sm text-label-sm">#投資</span>
+<span class="text-text-secondary font-label-sm text-label-sm">#資産形成</span>
+</div>
+</article>
+<!-- Card 5 -->
+<article class="glass-card rounded-xl p-6 antigravity-float flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<span class="px-3 py-1 rounded bg-surface-variant text-on-surface-variant font-label-sm text-label-sm">DIARY</span>
+<span class="text-text-secondary font-label-sm text-label-sm">2026年5月19日</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">沖縄のスターバックスとシーサー</h3>
+<div class="mt-auto pt-4 flex flex-wrap gap-2 border-t border-border-subtle">
+<span class="text-text-secondary font-label-sm text-label-sm">#旅行</span>
+<span class="text-text-secondary font-label-sm text-label-sm">#カフェ</span>
+</div>
+</article>
+<!-- Card 6 -->
+<article class="glass-card rounded-xl p-6 antigravity-float flex flex-col lg:col-span-2">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+<div class="flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<span class="px-3 py-1 rounded bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm">ENGLISH</span>
+<span class="text-text-secondary font-label-sm text-label-sm">2026年5月16日</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">TOEIC 905点。でも「英語ができる」は目的じゃない</h3>
+<p class="text-text-secondary text-body-md mb-4 flex-grow">目標スコア達成後の実務で感じた、言語学習の本質的な価値について振り返ります。</p>
+<div class="flex flex-wrap gap-2">
+<span class="text-text-secondary font-label-sm text-label-sm">#TOEIC</span>
+<span class="text-text-secondary font-label-sm text-label-sm">#英語学習</span>
+</div>
+</div>
+<div class="hidden md:block rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRrHfdfC4O-yBbIOphyMQJG0k6WVBfk-b9PAzOHHI1m0Yw-bBuQIVN-L2oTJes5j2IVcgWz7cdWUAxiQYvAZSgLp_4rsGwHgKteNblAPrKSQQXgdYu6G8LGszCl2r1ULmCVbjhwEUMZPNYr55qurH4cwAqtkiyWOy3fQ4JlZlPQBW5AhglZju_1PS1bD6QgP5r9bSbklHuJ4HNfgJ8mAwcOs-9Kvc2MQHwt4HsYfdnnwKuwI9TFh96tiDgPhNzNKCOJIJ87eSK2ZMo">
+</div>
+</div>
+</article>
+<!-- Card 7 -->
+<article class="glass-card rounded-xl p-6 antigravity-float flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<span class="px-3 py-1 rounded bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">LIFEHACK</span>
+<span class="text-text-secondary font-label-sm text-label-sm">2026年5月12日</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">Amazonとgeminiで、気になる本の中身を無料でのぞく方法</h3>
+<div class="mt-auto pt-4 flex flex-wrap gap-2 border-t border-border-subtle">
+<span class="text-text-secondary font-label-sm text-label-sm">#AI</span>
+<span class="text-text-secondary font-label-sm text-label-sm">#読書</span>
+</div>
+</article>
+</div>
+<!-- Tags Cloud Section -->
+<section class="mt-stack-lg border-t border-border-subtle pt-12"><h2 class="font-headline-md text-headline-md mb-8 flex items-center gap-2"><span class="material-symbols-outlined text-primary">grid_view</span>Categories</h2><div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-12"><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-primary-container text-on-primary-container antigravity-float glass-card text-center gap-3" href="/nursing"><span class="material-symbols-outlined text-3xl">medical_services</span><span class="font-headline-md">Nursing</span></a><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-secondary-container text-on-secondary-container antigravity-float glass-card text-center gap-3" href="/lifehack"><span class="material-symbols-outlined text-3xl">tips_and_updates</span><span class="font-headline-md">Lifehack</span></a><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed-variant antigravity-float glass-card text-center gap-3" href="/english"><span class="material-symbols-outlined text-3xl">language</span><span class="font-headline-md">English</span></a><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-surface-variant text-on-surface-variant antigravity-float glass-card text-center gap-3" href="/study"><span class="material-symbols-outlined text-3xl">menu_book</span><span class="font-headline-md">Study</span></a><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-primary-fixed text-on-primary-fixed-variant antigravity-float glass-card text-center gap-3" href="/diary"><span class="material-symbols-outlined text-3xl">auto_stories</span><span class="font-headline-md">Diary</span></a></div><div class="border-t border-border-subtle pt-8"><h3 class="font-label-sm text-label-sm text-text-secondary uppercase tracking-widest mb-6">Other Topics</h3><div class="flex flex-wrap gap-2"><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/AI/">#AI</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/DX/">#DX</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/PayPay/">#PayPay</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/SNS/">#SNS</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/TOEIC/">#TOEIC</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/キャリア/">#キャリア</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/健康/">#健康</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/医療情勢/">#医療情勢</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/将来性/">#将来性</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/投資/">#投資</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/旅行/">#旅行</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/生き方/">#生き方</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/節約/">#節約</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/越境学習/">#越境学習</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/資産形成/">#資産形成</a></div></div></section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 mt-stack-lg bg-surface-container-lowest border-t border-border-subtle">
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-2 gap-8">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary mb-4">NurseNotes</h2>
+<p class="font-label-sm text-label-sm text-text-secondary opacity-80 mb-6">© 2026 NurseNotes. Precision in Care, Clarity in Learning.</p>
+<div class="flex gap-4">
+<a class="text-text-secondary hover:text-primary transition-all duration-300" href="#"><span class="material-symbols-outlined">public</span></a>
+<a class="text-text-secondary hover:text-primary transition-all duration-300" href="#"><span class="material-symbols-outlined">share</span></a>
+</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+<div class="flex flex-col gap-2">
+<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/diary">Diary</a>
+<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/english">English</a>
+<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/study">Study</a>
+</div>
+<div class="flex flex-col gap-2">
+<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/reading">Reading</a>
+<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/nursing">Nursing</a>
+<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/lifehack">Lifehack</a>
+</div>
+<div class="flex flex-col gap-2">
+<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/about">About</a>
+<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/contact">Contact</a>
+</div>
+</div>
+</div>
+</footer>
+<!-- FAB for quick action -->
+<button class="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-primary text-on-primary shadow-xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95 z-50">
+<span class="material-symbols-outlined text-[28px]">edit</span>
+</button>
+<script is:inline>
         // Subtle micro-interaction: Header scroll effect
         window.addEventListener('scroll', () => {
             const header = document.querySelector('header');
@@ -616,185 +344,14 @@
         });
 
         // AI Chip close logic
-        const attribChip = document.getElementById('ai-chip-close');
-        if (attribChip) {
-            attribChip.addEventListener('click', (e) => {
-                const parent = e.currentTarget.closest('.inline-flex');
-                parent.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        const closeBtn = document.getElementById('ai-chip-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', (e) => {
+                const parent = e.currentTarget.parentElement;
+                parent.style.transition = 'opacity 0.3s ease';
                 parent.style.opacity = '0';
-                parent.style.transform = 'scale(0.9)';
                 setTimeout(() => parent.remove(), 300);
             });
         }
-
-        /* -------------------------------------------------------------
-         * AI Chatbot Dialogues Logic
-         * ------------------------------------------------------------- */
-        const chatbotResponses = [
-            {
-                keywords: ['英語', 'toeic', 'toeic905', 'english', '勉強'],
-                response: 'KiyoさんはTOEIC 905点を達成していますが、「英語ができること」は単なる通過点であり、目的ではないと語っています。実際の臨床や情報収集（一次資料の読解）で活かすことこそが本質的価値です。具体的な学習法としては、継続的なインプットとシャドーイングを重視しています。'
-            },
-            {
-                keywords: ['dx', '医療dx', '改定', '配置基準'],
-                response: '令和8年度の医療DX改定について、Kiyoさんは「急性期看護配置基準の柔軟化」に注目しています。これは現場のICT導入（スマートベッド、自動点滴監視等）によって、単純な人員配置から、実際のケア密度に応じた柔軟な運用への移行を促すものです。これにより現場の負担軽減とキャリア多様化が期待されています。'
-            },
-            {
-                keywords: ['キャリア', '目標設定', 'なりたい'],
-                response: 'Kiyoさんのキャリア論では、「看護師になること」自体を目標にしてはいけないと警鐘を鳴らしています。それは免許取得がゴールになり、その後の燃え尽き症候群を招くからです。「看護師という資格を使って、どのような価値を社会に提供したいか」を定義することをお勧めしています。'
-            },
-            {
-                keywords: ['投資', 'オルカン', '資産', 'お金'],
-                response: '資産形成において、Kiyoさんはシンプルさを追求しています。余計な個別銘柄分析はせず、「全世界株式（オール・カントリー）」一本に絞り、夫婦で毎月10万円をただ淡々と自動積立するだけのシンプルな仕組みを実践しています。浮いた時間を自己投資や看護学習に充てるためです。'
-            },
-            {
-                keywords: ['健康', '病気', 'utsu', '頑張りすぎる'],
-                response: '頑張りすぎると病気になるという記事では、キャリア系YouTuberのUtsuさんの活動休止を例に挙げています。人間の身体は自然の一部であり、過度なストレスや社会的な役割のみに縛られると歪みが生じます。「自然に沿った適度な生き方」と、しなやかなセルフケアの重要性を発信しています。'
-            },
-            {
-                keywords: ['本', 'のぞく', '無料', 'amazon', '読書'],
-                response: 'Amazonの「サンプル」とGeminiなどの対話AIを組み合わせて、本の目次や要約から気になる本の中身を立体的に分析し、本当に購入すべきか事前に見極める賢い読書ハックを紹介しています。本選びの失敗をなくす素晴らしいライフハックです。'
-            }
-        ];
-
-        const fab = document.getElementById('chatbot-fab');
-        const chatWindow = document.getElementById('global-chat-window');
-        const closeChat = document.getElementById('close-global-chat');
-        const sendBtn = document.getElementById('send-chat');
-        const chatInput = document.getElementById('chat-input');
-        const messagesContainer = document.getElementById('chat-messages-container');
-
-        fab.addEventListener('click', () => {
-            chatWindow.classList.toggle('hidden');
-            if (!chatWindow.classList.contains('hidden')) {
-                setTimeout(() => {
-                    chatWindow.style.opacity = '1';
-                    chatWindow.style.transform = 'scale(1)';
-                }, 50);
-                chatInput.focus();
-            }
-        });
-
-        closeChat.addEventListener('click', () => {
-            chatWindow.style.opacity = '0';
-            chatWindow.style.transform = 'scale(0.9)';
-            setTimeout(() => chatWindow.classList.add('hidden'), 300);
-        });
-
-        sendBtn.addEventListener('click', sendChatMessage);
-        chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') sendChatMessage();
-        });
-
-        function sendChatMessage() {
-            const text = chatInput.value.trim();
-            if (!text) return;
-
-            appendBubble('user', text);
-            chatInput.value = '';
-
-            // Typing indicator
-            const typingId = appendBubble('gemini', '...');
-
-            setTimeout(() => {
-                const typingBubble = document.getElementById(typingId);
-                if (typingBubble) typingBubble.remove();
-
-                const query = text.toLowerCase();
-                let match = chatbotResponses.find(item => 
-                    item.keywords.some(k => query.includes(k))
-                );
-
-                const responseText = match 
-                    ? match.response 
-                    : 'ご質問ありがとうございます！Kiyoさんのブログ情報（看護DXの急性期看護基準の緩和、TOEIC905点の学習本質論、インデックス全世界積立投資、Utsuさんの自然派ライフケア等）について質問を絞っていただくと、より詳細に解説できます。';
-
-                appendBubble('gemini', responseText);
-            }, 1000);
-        }
-
-        function appendBubble(sender, text) {
-            const bubble = document.createElement('div');
-            const id = 'bubble-' + Math.random().toString(36).substr(2, 9);
-            bubble.id = id;
-            if (sender === 'user') {
-                bubble.className = 'bg-[#276183] text-white p-3 rounded-2xl max-w-[85%] self-end leading-relaxed shadow-sm';
-            } else {
-                bubble.className = 'bg-zinc-100 text-zinc-800 p-3 rounded-2xl max-w-[85%] self-start leading-relaxed shadow-sm';
-            }
-            bubble.textContent = text;
-            messagesContainer.appendChild(bubble);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            return id;
-        }
-
-        /* -------------------------------------------------------------
-         * Text-to-Speech Player Controls
-         * ------------------------------------------------------------- */
-        const globalPlayer = document.getElementById('global-speech-player');
-        const playerTitle = document.getElementById('speech-title');
-        const playToggle = document.getElementById('audio-play-toggle');
-        const playerWave = document.getElementById('player-wave');
-        const closePlayer = document.getElementById('close-audio-player');
-        let isPlaying = false;
-
-        document.querySelectorAll('.speech-listen-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const article = e.currentTarget.closest('article');
-                const title = article.querySelector('h2, h3').textContent;
-                
-                playerTitle.textContent = title;
-                globalPlayer.classList.remove('hidden');
-                
-                // Play animation
-                isPlaying = true;
-                playToggle.innerHTML = '<span class="material-symbols-outlined text-sm">pause</span>';
-                playerWave.querySelectorAll('.bar').forEach(b => b.style.animationPlayState = 'running');
-            });
-        });
-
-        playToggle.addEventListener('click', () => {
-            if (isPlaying) {
-                playToggle.innerHTML = '<span class="material-symbols-outlined text-sm">play_arrow</span>';
-                playerWave.querySelectorAll('.bar').forEach(b => b.style.animationPlayState = 'paused');
-                isPlaying = false;
-            } else {
-                playToggle.innerHTML = '<span class="material-symbols-outlined text-sm">pause</span>';
-                playerWave.querySelectorAll('.bar').forEach(b => b.style.animationPlayState = 'running');
-                isPlaying = true;
-            }
-        });
-
-        closePlayer.addEventListener('click', () => {
-            globalPlayer.classList.add('hidden');
-            isPlaying = false;
-        });
-
-        /* -------------------------------------------------------------
-         * Database and Authentication Lock/Unlock Portal
-         * ------------------------------------------------------------- */
-        const authBtn = document.getElementById('auth-main-btn');
-        const headerAuth = document.getElementById('header-auth-container');
-        const vipLocker = document.getElementById('vip-locker');
-        let isLoggedIn = false;
-
-        authBtn.addEventListener('click', () => {
-            authBtn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">sync</span> Loading...';
-            setTimeout(() => {
-                isLoggedIn = true;
-                headerAuth.innerHTML = `
-                    <div class="flex items-center gap-2 bg-white/80 border border-black/5 px-3 py-1.5 rounded-full shadow-sm animate-fade-in">
-                        <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
-                        <span class="text-xs font-bold text-zinc-700">Kiyo Member</span>
-                        <div class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center font-bold text-[10px]">K</div>
-                    </div>
-                `;
-                
-                // Remove Locker overlay
-                vipLocker.classList.add('unlocked');
-                setTimeout(() => vipLocker.remove(), 500);
-            }, 1200);
-        });
     </script>
-</body>
-</html>
+</body></html>
