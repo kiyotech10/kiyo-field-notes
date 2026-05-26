@@ -39,126 +39,54 @@ const { tag, posts } = Astro.props;
 	<head>
 		<BaseHead title={`#${tag} — ${SITE_TITLE}`} description={`タグ「${tag}」の記事一覧`} />
 	</head>
-	<body>
+	<body class="bg-surface text-on-background font-body-md min-h-screen">
 		<Header />
-		<main>
-			<div class="page-header">
-				<a href="/" class="back-link">← ホーム</a>
-				<h1 class="tag-heading"><span class="hash">#</span>{tag}</h1>
-				<p class="count">{posts.length}件の記事</p>
+		<main class="pt-32 pb-stack-lg px-margin-mobile md:px-gutter max-w-container-max mx-auto">
+			<div class="mb-12 relative fade-in">
+				<a href="/" class="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors text-xs font-semibold uppercase tracking-wider mb-4">
+					<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+					Home
+				</a>
+				<h1 class="font-headline-lg text-headline-lg text-primary mb-3 flex items-center gap-2">
+					<span class="text-primary-container font-light">#</span>{tag}
+				</h1>
+				<p class="font-body-lg text-body-lg text-text-secondary leading-relaxed max-w-2xl">
+					{posts.length}件の記事が見つかりました。
+				</p>
 			</div>
-			<ul class="post-list">
+
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 				{posts.map((post) => (
-					<li>
-						<a href={`/${post.category}/${post.id}/`} class="post-row">
-							<div class="post-info">
-								<span class="post-cat">{post.category}</span>
-								<span class="post-title">{post.data.title}</span>
-								<div class="post-meta">
-									<time class="post-date"><FormattedDate date={post.data.pubDate} /></time>
-									{(post.data.tags ?? []).filter((t) => t !== tag).map((t) => (
-										<a href={`/tags/${t}/`} class="tag-chip">#{t}</a>
+					<a href={`/${post.category}/${post.id}/`} class="block group">
+						<article class="glass-card rounded-xl p-6 md:p-8 antigravity-float flex flex-col justify-between h-full border border-black/[0.05]">
+							<div>
+								<div class="flex justify-between items-center mb-4 text-xs text-text-secondary">
+									<span class="px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-semibold uppercase tracking-wider">
+										{post.category.toUpperCase()}
+									</span>
+									<time class="font-label-sm">
+										<FormattedDate date={post.data.pubDate} />
+									</time>
+								</div>
+								<h2 class="font-headline-md text-headline-md text-text-primary mb-3 group-hover:text-primary transition-colors line-clamp-2">
+									{post.data.title}
+								</h2>
+								<p class="text-text-secondary text-body-md leading-relaxed line-clamp-3 mb-4">
+									{post.data.description}
+								</p>
+							</div>
+							{post.data.tags && post.data.tags.length > 0 && (
+								<div class="flex flex-wrap gap-1.5 mt-auto pt-4 border-t border-border-subtle">
+									{post.data.tags.map((t) => (
+										<span class={`font-label-sm text-[11px] ${t === tag ? 'text-primary font-bold' : 'text-text-secondary opacity-75'}`}>#{t}</span>
 									))}
 								</div>
-							</div>
-						</a>
-					</li>
+							)}
+						</article>
+					</a>
 				))}
-			</ul>
+			</div>
 		</main>
 		<Footer />
 	</body>
 </html>
-
-<style>
-	.page-header {
-		margin-bottom: 2.5em;
-		padding-bottom: 1.5em;
-		border-bottom: 1px solid var(--border);
-	}
-	.back-link {
-		display: inline-block;
-		font-size: 0.7em;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		color: var(--text-muted);
-		text-decoration: none;
-		margin-bottom: 1em;
-	}
-	.back-link:hover { color: var(--accent); text-decoration: none; }
-	.tag-heading {
-		font-size: 1.6em;
-		font-weight: 500;
-		margin: 0 0 0.2em;
-		letter-spacing: -0.01em;
-	}
-	.hash { color: var(--accent); }
-	.count {
-		font-size: 0.78em;
-		color: var(--text-muted);
-		margin: 0;
-	}
-
-	.post-list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-	}
-	.post-list li {
-		border-bottom: 1px solid var(--border);
-	}
-	.post-list li:first-child {
-		border-top: 1px solid var(--border);
-	}
-	.post-row {
-		display: flex;
-		padding: 1.1em 0;
-		text-decoration: none;
-		color: var(--text);
-	}
-	.post-row:hover .post-title { color: var(--accent); }
-	.post-info {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25em;
-		width: 100%;
-	}
-	.post-cat {
-		font-size: 0.6em;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: var(--accent);
-		font-weight: 500;
-	}
-	.post-title {
-		font-size: 0.9em;
-		font-weight: 500;
-		line-height: 1.5;
-		letter-spacing: -0.01em;
-		transition: color 0.15s;
-	}
-	.post-meta {
-		display: flex;
-		align-items: center;
-		gap: 0.6em;
-		flex-wrap: wrap;
-	}
-	.post-date {
-		font-size: 0.7em;
-		color: var(--text-muted);
-	}
-	.tag-chip {
-		font-size: 0.65em;
-		color: var(--text-muted);
-		text-decoration: none;
-		border: 1px solid var(--border);
-		border-radius: 2em;
-		padding: 0.1em 0.5em;
-		transition: color 0.15s, border-color 0.15s;
-	}
-	.tag-chip:hover {
-		color: var(--accent);
-		border-color: var(--accent);
-		text-decoration: none;
-	}
-</style>

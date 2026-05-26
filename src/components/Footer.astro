@@ -1,26 +1,60 @@
 ---
+import { SITE_TITLE } from '../consts';
 const today = new Date();
 ---
 
-<footer>
-	<div class="footer-inner">
-		<p>&copy; {today.getFullYear()} Kiyo. All rights reserved.</p>
+<footer class="w-full py-12 mt-16 bg-[#ffffff] border-t border-black/[0.05]">
+	<div class="max-w-[1100px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+		<div>
+			<h2 class="font-headline-md text-lg text-primary mb-3 font-bold">{SITE_TITLE}</h2>
+			<p class="text-xs text-text-secondary opacity-85 mb-4">© {today.getFullYear()} {SITE_TITLE}. Precision in Care, Clarity in Learning.</p>
+			<div class="flex gap-3">
+				<a class="text-text-secondary hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined text-sm">public</span></a>
+				<a class="text-text-secondary hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined text-sm">share</span></a>
+			</div>
+		</div>
+		<div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+			<div class="flex flex-col gap-1.5">
+				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/diary">Diary</a>
+				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/english">English</a>
+				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/study">Study</a>
+			</div>
+			<div class="flex flex-col gap-1.5">
+				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/reading">Reading</a>
+				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/nursing">Nursing</a>
+				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/lifehack">Lifehack</a>
+			</div>
+			<div class="flex flex-col gap-1.5">
+				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/about">About</a>
+				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/contact">Contact</a>
+			</div>
+		</div>
 	</div>
 </footer>
 
-<button id="back-to-top" aria-label="ページトップへ">↑</button>
+<button id="back-to-top" class="fixed bottom-8 right-8 w-12 h-12 rounded-full bg-primary text-white shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 pointer-events-none opacity-0 z-50">
+	<span class="material-symbols-outlined text-lg">arrow_upward</span>
+</button>
 
-<script>
-	// Back to top
+<script is:inline>
+	// Back to top behavior
 	const btn = document.getElementById('back-to-top');
 	window.addEventListener('scroll', () => {
-		btn?.classList.toggle('visible', window.scrollY > 300);
+		if (window.scrollY > 300) {
+			btn?.classList.remove('opacity-0', 'pointer-events-none');
+			btn?.classList.add('opacity-100');
+			btn?.setAttribute('style', 'pointer-events: auto;');
+		} else {
+			btn?.classList.add('opacity-0', 'pointer-events-none');
+			btn?.classList.remove('opacity-100');
+			btn?.removeAttribute('style');
+		}
 	});
 	btn?.addEventListener('click', () => {
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 	});
 
-	// Scroll fade-in
+	// Scroll fade-in transition
 	const observer = new IntersectionObserver(
 		(entries) => {
 			entries.forEach((entry) => {
@@ -30,55 +64,7 @@ const today = new Date();
 				}
 			});
 		},
-		{ threshold: 0.08 },
+		{ threshold: 0.08 }
 	);
 	document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
 </script>
-
-<style>
-	footer {
-		border-top: 1px solid var(--border);
-		margin-top: 4em;
-	}
-	.footer-inner {
-		padding: 2rem max(1.5rem, 4vw);
-	}
-	p {
-		font-size: 0.8em;
-		color: var(--text-muted);
-		margin: 0;
-		letter-spacing: 0.03em;
-	}
-
-	#back-to-top {
-		position: fixed;
-		bottom: 2rem;
-		right: 2rem;
-		width: 48px;
-		height: 48px;
-		border-radius: 50%;
-		background: var(--accent);
-		color: #fff;
-		border: none;
-		cursor: pointer;
-		font-size: 1.2em;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		opacity: 0;
-		transform: scale(0.8) translateY(16px);
-		transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s;
-		pointer-events: none;
-		z-index: 200;
-		box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-	}
-	#back-to-top.visible {
-		opacity: 1;
-		transform: scale(1) translateY(0);
-		pointer-events: all;
-	}
-	#back-to-top:hover {
-		background: var(--accent-light);
-		box-shadow: 0 6px 20px rgba(0,0,0,0.18);
-	}
-</style>

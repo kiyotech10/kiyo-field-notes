@@ -19,79 +19,55 @@ const description = '読んだ本・論文・記事のメモ。';
 	<head>
 		<BaseHead title={`${title} — ${SITE_TITLE}`} description={description} />
 	</head>
-	<body style="--accent:#b07830;--accent-light:#c89050">
+	<body class="bg-surface text-on-background font-body-md min-h-screen">
 		<Header />
-		<main>
-			<h1>{title}</h1>
-			<p class="category-desc">{description}</p>
-			<hr />
-			<ul class="post-list">
-				{
-					posts.map((post) => (
-						<li class="fade-in">
-							<a href={`/reading/${post.id}/`}>
-								<h2>{post.data.title}</h2>
-								<p class="post-desc">{post.data.description}</p>
-								<time class="post-date">
-									<FormattedDate date={post.data.pubDate} />
-								</time>
-							</a>
-						</li>
-					))
-				}
-			</ul>
+		<main class="pt-32 pb-stack-lg px-margin-mobile md:px-gutter max-w-container-max mx-auto">
+			<div class="mb-12 relative fade-in">
+				<a href="/" class="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors text-xs font-semibold uppercase tracking-wider mb-4">
+					<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+					Home
+				</a>
+				<h1 class="font-headline-lg text-headline-lg text-primary mb-3 flex items-center gap-2">
+					<span class="material-symbols-outlined text-3xl">library_books</span>
+					{title}
+				</h1>
+				<p class="font-body-lg text-body-lg text-text-secondary leading-relaxed max-w-2xl">
+					{description}
+				</p>
+			</div>
+
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+				{posts.map((post) => (
+					<a href={`/reading/${post.id}/`} class="block group">
+						<article class="glass-card rounded-xl p-6 md:p-8 antigravity-float flex flex-col justify-between h-full border border-black/[0.05]">
+							<div>
+								<div class="flex justify-between items-center mb-4 text-xs text-text-secondary">
+									<span class="px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-semibold uppercase tracking-wider">
+										{title}
+									</span>
+									<time class="font-label-sm">
+										<FormattedDate date={post.data.pubDate} />
+									</time>
+								</div>
+								<h2 class="font-headline-md text-headline-md text-text-primary mb-3 group-hover:text-primary transition-colors line-clamp-2">
+									{post.data.title}
+								</h2>
+								<p class="text-text-secondary text-body-md leading-relaxed line-clamp-3 mb-4">
+									{post.data.description}
+								</p>
+							</div>
+							{post.data.tags && post.data.tags.length > 0 && (
+								<div class="flex flex-wrap gap-1.5 mt-auto pt-4 border-t border-border-subtle">
+									{post.data.tags.map((tag) => (
+										<span class="text-primary font-label-sm text-[11px]">#{tag}</span>
+									))}
+								</div>
+							)}
+						</article>
+					</a>
+				))}
+			</div>
 		</main>
 		<Footer />
 	</body>
 </html>
-
-<style>
-	h1 {
-		font-size: 1em;
-		font-weight: 600;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		margin-bottom: 0.4em;
-	}
-	.category-desc {
-		color: var(--text-muted);
-		font-size: 0.92em;
-		margin: 0 0 1.5em;
-	}
-	.post-list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-	}
-	.post-list li {
-		border-bottom: 1px solid var(--border);
-	}
-	.post-list li:first-child {
-		border-top: 1px solid var(--border);
-	}
-	.post-list a {
-		display: block;
-		padding: 1.6em 0;
-		text-decoration: none;
-		color: var(--text);
-	}
-	.post-list a:hover h2 {
-		color: var(--accent);
-	}
-	.post-list h2 {
-		font-size: 1.2em;
-		font-weight: 500;
-		margin: 0 0 0.4em;
-	}
-	.post-desc {
-		font-size: 0.88em;
-		color: var(--text-muted);
-		margin: 0 0 0.5em;
-		line-height: 1.6;
-	}
-	.post-date {
-		font-size: 0.78em;
-		color: var(--text-muted);
-		letter-spacing: 0.02em;
-	}
-</style>

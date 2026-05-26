@@ -3,113 +3,37 @@ import { SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
 ---
 
-<header>
-	<div class="header-inner">
-		<a href="/" class="site-title">{SITE_TITLE}</a>
-		<nav>
-			<HeaderLink href="/diary">Diary</HeaderLink>
-			<HeaderLink href="/english">English</HeaderLink>
-			<HeaderLink href="/study">Study</HeaderLink>
-			<HeaderLink href="/reading">Reading</HeaderLink>
-			<HeaderLink href="/nursing">Nursing</HeaderLink>
-			<HeaderLink href="/lifehack">Lifehack</HeaderLink>
-			<HeaderLink href="/about">About</HeaderLink>
-			<HeaderLink href="/contact">Contact</HeaderLink>
+<header class="fixed top-0 w-full z-50 bg-surface-glass backdrop-blur-xl border-b border-border-subtle shadow-[0px_10px_40px_rgba(0,0,0,0.04)] transition-all duration-300">
+	<div class="max-w-[1100px] mx-auto px-6 flex justify-between items-center h-16">
+		<a class="font-headline-md text-headline-md text-primary tracking-tight font-bold hover:opacity-85 transition-opacity" href="/">{SITE_TITLE}</a>
+		<nav class="hidden md:flex space-x-6">
+			<HeaderLink href="/diary" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Diary</HeaderLink>
+			<HeaderLink href="/study" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Study</HeaderLink>
+			<HeaderLink href="/nursing" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Nursing</HeaderLink>
+			<HeaderLink href="/lifehack" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Lifehack</HeaderLink>
+			<HeaderLink href="/reading" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Reading</HeaderLink>
+			<HeaderLink href="/about" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">About</HeaderLink>
+			<HeaderLink href="/contact" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Contact</HeaderLink>
 		</nav>
 	</div>
 </header>
 
+<script is:inline>
+	// Subtle micro-interaction: Header scroll effect
+	window.addEventListener('scroll', () => {
+		const header = document.querySelector('header');
+		if (window.scrollY > 20) {
+			header?.classList.add('shadow-lg');
+		} else {
+			header?.classList.remove('shadow-lg');
+		}
+	});
+</script>
+
 <style>
-	header {
-		position: sticky;
-		top: 0;
-		z-index: 100;
-		background: rgba(248, 249, 250, 0.85); /* Semitransparent background matching --bg */
-		backdrop-filter: blur(16px);
-		-webkit-backdrop-filter: blur(16px);
-		border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Hairline transparent separator */
-		transition: background-color 0.3s ease;
-	}
-	.header-inner {
-		width: 100%;
-		padding: 0 max(1.5rem, 4vw);
-		height: 56px;
-		display: flex;
-		align-items: center;
-		gap: 2.5rem;
-	}
-	.site-title {
-		font-family: var(--font-heading);
-		font-size: 0.82em;
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		color: var(--text);
-		text-decoration: none;
-		text-transform: uppercase;
-		white-space: nowrap;
-		transition: var(--transition-google);
-	}
-	.site-title:hover {
-		color: var(--accent);
-		text-decoration: none;
-	}
-	nav {
-		display: flex;
-		align-items: center;
-		gap: 0 1.8rem;
-		flex-wrap: wrap;
-	}
-	nav :global(a) {
-		font-size: 0.72em;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--text-muted);
-		text-decoration: none;
-		transition: var(--transition-google);
-		font-weight: 500;
-		position: relative;
-		padding: 0.3rem 0;
-	}
-	nav :global(a::after) {
-		content: '';
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		width: 100%;
-		height: 2px;
-		background-color: var(--accent);
-		transform: scaleX(0);
-		transform-origin: right;
-		transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-		border-radius: 999px;
-	}
-	nav :global(a:hover) {
-		color: var(--text);
-	}
-	nav :global(a:hover::after) {
-		transform: scaleX(1);
-		transform-origin: left;
-	}
+	/* Header link active highlight styling */
 	nav :global(a.active) {
-		color: var(--accent);
-		font-weight: 600;
-	}
-	nav :global(a.active::after) {
-		transform: scaleX(1);
-		background-color: var(--accent);
-	}
-	@media (max-width: 720px) {
-		.header-inner {
-			padding: 0 1.2rem;
-			height: auto;
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 0.4rem;
-			padding-top: 1rem;
-			padding-bottom: 1rem;
-		}
-		nav {
-			gap: 0.6rem 1.2rem;
-		}
+		color: #276183 !important;
+		font-weight: 600 !important;
 	}
 </style>
