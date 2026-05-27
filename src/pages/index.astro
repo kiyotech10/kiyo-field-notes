@@ -143,8 +143,8 @@
 <!-- TopNavBar -->
 <header class="fixed top-0 w-full z-50 bg-surface-glass backdrop-blur-xl border-b border-border-subtle shadow-[0px_10px_40px_rgba(0,0,0,0.04)]">
 <div class="max-w-container-max mx-auto px-gutter flex justify-between items-center h-16">
-<a class="font-headline-md text-headline-md text-primary tracking-tight font-bold" href="/">男性看護師のフィールドノート</a>
-<nav class="hidden md:flex space-x-6">
+<a class="font-headline-md text-headline-md text-primary tracking-tight font-bold truncate mr-3" href="/">男性看護師のフィールドノート</a>
+<nav class="hidden md:flex space-x-6 shrink-0">
 <a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/diary">Diary</a>
 <a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/study">Study</a>
 <a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/nursing">Nursing</a>
@@ -152,13 +152,27 @@
 <a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/reading">Reading</a>
 <a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/about">About</a>
 </nav>
-<div class="flex items-center gap-4">
+<div class="flex items-center gap-3 shrink-0">
 <div class="relative hidden sm:block">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-[20px]">search</span>
 <input class="well-input pl-10 pr-4 py-1.5 rounded-full text-body-md w-48 focus:w-64" placeholder="Search..." type="text">
 </div>
-<button class="bg-primary text-on-primary px-5 py-2 rounded-full font-label-sm text-label-sm hover:scale-105 hover:shadow-lg transition-all duration-300">Contact</button>
+<a href="/contact" class="hidden sm:block bg-primary text-on-primary px-5 py-2 rounded-full font-label-sm text-label-sm hover:scale-105 hover:shadow-lg transition-all duration-300">Contact</a>
+<button id="mobile-menu-btn" class="md:hidden p-2 -mr-1 rounded-lg text-text-secondary hover:bg-black/5 transition-colors" aria-label="メニュー">
+<span class="material-symbols-outlined" style="vertical-align:middle;font-size:24px">menu</span>
+</button>
 </div>
+</div>
+<div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-xl border-t border-border-subtle shadow-lg">
+<nav class="max-w-container-max mx-auto px-gutter py-2 flex flex-col">
+<a class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block" href="/diary">Diary</a>
+<a class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block" href="/study">Study</a>
+<a class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block" href="/nursing">Nursing</a>
+<a class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block" href="/lifehack">Lifehack</a>
+<a class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block" href="/reading">Reading</a>
+<a class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block" href="/about">About</a>
+<a class="py-3 text-primary font-semibold hover:opacity-80 transition-colors font-body-md text-body-md block" href="/contact">Contact</a>
+</nav>
 </div>
 </header>
 <main class="pt-32 pb-stack-lg px-margin-mobile md:px-gutter max-w-container-max mx-auto">
@@ -166,7 +180,7 @@
 <section class="mb-stack-lg relative">
 <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
 <div class="md:col-span-8">
-<h1 class="font-headline-lg text-headline-lg mb-stack-md text-primary">はじめまして、男性看護師です。</h1>
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-md text-primary">はじめまして、男性看護師です。</h1>
 <p class="font-body-lg text-body-lg text-text-secondary leading-relaxed mb-stack-md max-w-2xl">
                         医療分野で働く男性看護師です。日々の仕事や学びのプロセスで得た「より良く生きるための知恵」や「学習の効率化」について発信しています。
                     </p>
@@ -364,6 +378,18 @@
                 header.classList.remove('shadow-lg');
             }
         });
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                const isOpen = !mobileMenu.classList.contains('hidden');
+                mobileMenu.classList.toggle('hidden');
+                const icon = mobileMenuBtn.querySelector('.material-symbols-outlined');
+                if (icon) icon.textContent = isOpen ? 'menu' : 'close';
+            });
+        }
 
         // AI Chip close logic
         const closeBtn = document.getElementById('ai-chip-close-btn');

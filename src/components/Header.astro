@@ -5,8 +5,8 @@ import HeaderLink from './HeaderLink.astro';
 
 <header class="fixed top-0 w-full z-50 bg-surface-glass backdrop-blur-xl border-b border-border-subtle shadow-[0px_10px_40px_rgba(0,0,0,0.04)] transition-all duration-300">
 	<div class="max-w-[1100px] mx-auto px-6 flex justify-between items-center h-16">
-		<a class="font-headline-md text-headline-md text-primary tracking-tight font-bold hover:opacity-85 transition-opacity" href="/">{SITE_TITLE}</a>
-		<nav class="hidden md:flex space-x-6">
+		<a class="font-headline-md text-headline-md text-primary tracking-tight font-bold hover:opacity-85 transition-opacity truncate mr-4" href="/">{SITE_TITLE}</a>
+		<nav class="hidden md:flex space-x-6 shrink-0">
 			<HeaderLink href="/diary" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Diary</HeaderLink>
 			<HeaderLink href="/study" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Study</HeaderLink>
 			<HeaderLink href="/nursing" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Nursing</HeaderLink>
@@ -15,11 +15,24 @@ import HeaderLink from './HeaderLink.astro';
 			<HeaderLink href="/about" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">About</HeaderLink>
 			<HeaderLink href="/contact" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Contact</HeaderLink>
 		</nav>
+		<button id="mobile-menu-btn" class="md:hidden p-2 -mr-1 rounded-lg text-text-secondary hover:bg-black/5 transition-colors shrink-0" aria-label="メニュー">
+			<span class="material-symbols-outlined" style="vertical-align:middle;font-size:24px">menu</span>
+		</button>
+	</div>
+	<div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-xl border-t border-border-subtle shadow-lg">
+		<nav class="px-6 py-2 flex flex-col">
+			<HeaderLink href="/diary" class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block">Diary</HeaderLink>
+			<HeaderLink href="/study" class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block">Study</HeaderLink>
+			<HeaderLink href="/nursing" class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block">Nursing</HeaderLink>
+			<HeaderLink href="/lifehack" class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block">Lifehack</HeaderLink>
+			<HeaderLink href="/reading" class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block">Reading</HeaderLink>
+			<HeaderLink href="/about" class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block">About</HeaderLink>
+			<HeaderLink href="/contact" class="py-3 text-primary font-semibold hover:opacity-80 transition-colors font-body-md text-body-md block">Contact</HeaderLink>
+		</nav>
 	</div>
 </header>
 
 <script is:inline>
-	// Subtle micro-interaction: Header scroll effect
 	window.addEventListener('scroll', () => {
 		const header = document.querySelector('header');
 		if (window.scrollY > 20) {
@@ -28,10 +41,20 @@ import HeaderLink from './HeaderLink.astro';
 			header?.classList.remove('shadow-lg');
 		}
 	});
+
+	const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+	const mobileMenu = document.getElementById('mobile-menu');
+	if (mobileMenuBtn && mobileMenu) {
+		mobileMenuBtn.addEventListener('click', () => {
+			const isOpen = !mobileMenu.classList.contains('hidden');
+			mobileMenu.classList.toggle('hidden');
+			const icon = mobileMenuBtn.querySelector('.material-symbols-outlined');
+			if (icon) icon.textContent = isOpen ? 'menu' : 'close';
+		});
+	}
 </script>
 
 <style>
-	/* Header link active highlight styling */
 	nav :global(a.active) {
 		color: #276183 !important;
 		font-weight: 600 !important;
