@@ -20,8 +20,10 @@
 	box-sizing: border-box;
 }
 
-html {
+html,
+body {
 	overflow-x: hidden;
+	max-width: 100%;
 }
 
 body {
@@ -129,11 +131,21 @@ hr {
 	margin: 3em 0;
 }
 
+/* 横長テーブルはこのラッパー内だけで横スクロールさせ、本文や
+   ページ全体が横スクロールしないようにする（rehypeTableWrap で付与） */
+.table-scroll {
+	max-width: 100%;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	margin: 2em 0;
+}
+
 table {
-	width: 100%;
+	width: auto;
+	min-width: 100%;
 	border-collapse: collapse;
 	font-size: 0.9em;
-	margin: 2em 0;
+	margin: 0;
 }
 
 th,
@@ -141,6 +153,7 @@ td {
 	border: 1px solid var(--border);
 	padding: 0.8em 1em;
 	text-align: left;
+	white-space: nowrap;
 }
 
 th {
@@ -156,6 +169,37 @@ ol {
 }
 
 li { margin-bottom: 0.5em; }
+
+/* Shared UI primitives (以前は index.astro のインラインstyleにのみ存在し、
+   他ページの glass-card / antigravity-float が無効化されていたため全体へ移設) */
+.glass-card {
+	background: rgba(255, 255, 255, 0.7);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border: 1px solid rgba(0, 0, 0, 0.05);
+}
+.material-symbols-outlined {
+	font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+	vertical-align: middle;
+}
+.antigravity-float {
+	transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+.antigravity-float:hover {
+	transform: translateY(-8px) scale(1.02);
+	box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.08);
+}
+.well-input {
+	background: rgba(0, 0, 0, 0.02);
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	transition: all 0.3s ease;
+}
+.well-input:focus {
+	background: #ffffff;
+	border-color: #276183;
+	outline: none;
+	box-shadow: 0 0 0 4px rgba(39, 97, 131, 0.1);
+}
 
 /* Scroll fade-in effect rules */
 .fade-in {

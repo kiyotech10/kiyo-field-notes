@@ -1,200 +1,69 @@
 ---
-// Antigravity Ethos - Clean Website Update
-// Rendered exactly matching the user's designed HTML layout
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import profileImage from '../assets/blog-placeholder-about.jpg';
+
+const categories = ['diary', 'english', 'study', 'reading', 'nursing', 'lifehack'] as const;
+type Cat = (typeof categories)[number];
+
+const catMeta: Record<Cat, { label: string; badge: string }> = {
+	diary:    { label: 'DIARY',    badge: 'bg-surface-variant text-on-surface-variant' },
+	english:  { label: 'ENGLISH',  badge: 'bg-tertiary-fixed text-on-tertiary-fixed-variant' },
+	study:    { label: 'STUDY',    badge: 'bg-primary-fixed text-on-primary-fixed-variant' },
+	reading:  { label: 'READING',  badge: 'bg-secondary-container text-on-secondary-container' },
+	nursing:  { label: 'NURSING',  badge: 'bg-primary-fixed text-on-primary-fixed-variant' },
+	lifehack: { label: 'LIFEHACK', badge: 'bg-secondary-container text-on-secondary-container' },
+};
+
+// 全カテゴリの記事を集約し、公開日の新しい順に並べる（ハードコードを廃止し新着が自動反映されるように）
+const all = (
+	await Promise.all(
+		categories.map(async (cat) =>
+			(await getCollection(cat)).map((post) => ({ cat, post })),
+		),
+	)
+)
+	.flat()
+	.sort((a, b) => b.post.data.pubDate.valueOf() - a.post.data.pubDate.valueOf());
+
+// 注目記事（featured 指定があれば最新のものを、なければ全体の最新を大カードに）
+const featured = all.find((e) => e.post.data.featured) ?? all[0];
+const rest = all.filter((e) => e !== featured);
+
+const fmtDate = (d: Date) =>
+	d.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
 ---
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>フィールドノート</title>
-    <script is:inline src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    <script is:inline id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            "colors": {
-                    "outline": "#71787e",
-                    "on-primary-fixed": "#001e2e",
-                    "text-primary": "#1A1C1E",
-                    "inverse-surface": "#2e3132",
-                    "on-tertiary": "#ffffff",
-                    "border-subtle": "rgba(0, 0, 0, 0.05)",
-                    "outline-variant": "#c1c7ce",
-                    "on-tertiary-fixed-variant": "#673d02",
-                    "secondary-container": "#cee8e1",
-                    "surface": "#f8fafb",
-                    "text-secondary": "#626A71",
-                    "surface-bright": "#f8fafb",
-                    "on-error": "#ffffff",
-                    "on-background": "#191c1d",
-                    "error": "#ba1a1a",
-                    "tertiary-fixed": "#ffddbb",
-                    "tertiary-container": "#9c6a2f",
-                    "surface-dim": "#d8dadb",
-                    "surface-container-highest": "#e1e3e4",
-                    "on-primary": "#ffffff",
-                    "on-secondary-fixed-variant": "#344b47",
-                    "on-secondary-container": "#526964",
-                    "inverse-on-surface": "#eff1f2",
-                    "surface-container": "#eceeef",
-                    "on-secondary-fixed": "#081f1c",
-                    "error-container": "#ffdad6",
-                    "on-surface-variant": "#41484d",
-                    "on-secondary": "#ffffff",
-                    "on-tertiary-container": "#fffbff",
-                    "primary-container": "#437a9d",
-                    "surface-tint": "#2a6485",
-                    "on-surface": "#191c1d",
-                    "primary-fixed": "#c7e7ff",
-                    "tertiary-fixed-dim": "#f8bb77",
-                    "inverse-primary": "#97cdf3",
-                    "secondary-fixed": "#cee8e1",
-                    "on-tertiary-fixed": "#2b1700",
-                    "on-primary-fixed-variant": "#034c6c",
-                    "surface-variant": "#e1e3e4",
-                    "primary-fixed-dim": "#97cdf3",
-                    "surface-glass": "rgba(255, 255, 255, 0.7)",
-                    "surface-container-low": "#f2f4f5",
-                    "secondary": "#4c635e",
-                    "on-primary-container": "#fcfcff",
-                    "background": "#f8fafb",
-                    "on-error-container": "#93000a",
-                    "primary": "#276183",
-                    "surface-container-lowest": "#ffffff",
-                    "tertiary": "#805218",
-                    "secondary-fixed-dim": "#b3ccc6",
-                    "surface-container-high": "#e6e8e9"
-            },
-            "borderRadius": {
-                    "DEFAULT": "0.25rem",
-                    "lg": "0.5rem",
-                    "xl": "0.75rem",
-                    "full": "9999px"
-            },
-            "spacing": {
-                    "container-max": "1100px",
-                    "stack-lg": "48px",
-                    "margin-mobile": "20px",
-                    "stack-sm": "8px",
-                    "gutter": "24px",
-                    "stack-md": "16px"
-            },
-            "fontFamily": {
-                    "headline-lg": ["Plus Jakarta Sans"],
-                    "headline-lg-mobile": ["Plus Jakarta Sans"],
-                    "label-sm": ["Inter"],
-                    "body-lg": ["Inter"],
-                    "headline-md": ["Plus Jakarta Sans"],
-                    "body-md": ["Inter"]
-            },
-            "fontSize": {
-                    "headline-lg": ["32px", {"lineHeight": "1.3", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                    "headline-lg-mobile": ["24px", {"lineHeight": "1.3", "fontWeight": "700"}],
-                    "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
-                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
-                    "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
-                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
-            }
-          },
-        },
-      }
-    </script>
-<style>
-        body {
-            background-color: #F8FAFB;
-            color: #1A1C1E;
-            -webkit-font-smoothing: antialiased;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
-        }
-        .antigravity-float {
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-        }
-        .antigravity-float:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.08);
-        }
-        .well-input {
-            background: rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-        .well-input:focus {
-            background: #ffffff;
-            border-color: #276183;
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(39, 97, 131, 0.1);
-        }
-    </style>
+	<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 </head>
-<body class="font-body-md text-body-md">
-<!-- TopNavBar -->
-<header class="fixed top-0 w-full z-50 bg-surface-glass backdrop-blur-xl border-b border-border-subtle shadow-[0px_10px_40px_rgba(0,0,0,0.04)]">
-<div class="max-w-container-max mx-auto px-gutter flex justify-between items-center h-16">
-<a class="font-headline-md text-headline-md text-primary tracking-tight font-bold truncate mr-3" href="/">フィールドノート</a>
-<nav class="hidden md:flex space-x-6 shrink-0">
-<a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/diary">Diary</a>
-<a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/study">Study</a>
-<a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/nursing">Nursing</a>
-<a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/lifehack">Lifehack</a>
-<a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/reading">Reading</a>
-<a class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="/about">About</a>
-</nav>
-<div class="flex items-center gap-3 shrink-0">
-<div class="relative hidden sm:block">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-[20px]">search</span>
-<input class="well-input pl-10 pr-4 py-1.5 rounded-full text-body-md w-48 focus:w-64" placeholder="Search..." type="text">
-</div>
-<a href="/contact" class="hidden sm:block bg-primary text-on-primary px-5 py-2 rounded-full font-label-sm text-label-sm hover:scale-105 hover:shadow-lg transition-all duration-300">Contact</a>
-<button id="mobile-menu-btn" class="md:hidden p-2 -mr-1 rounded-lg text-text-secondary hover:bg-black/5 transition-colors" aria-label="メニュー">
-<span class="material-symbols-outlined" style="vertical-align:middle;font-size:24px">menu</span>
-</button>
-</div>
-</div>
-<div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-xl border-t border-border-subtle shadow-lg">
-<nav class="max-w-container-max mx-auto px-gutter py-2 flex flex-col">
-<a class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block" href="/diary">Diary</a>
-<a class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block" href="/study">Study</a>
-<a class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block" href="/nursing">Nursing</a>
-<a class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block" href="/lifehack">Lifehack</a>
-<a class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block" href="/reading">Reading</a>
-<a class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block" href="/about">About</a>
-<a class="py-3 text-primary font-semibold hover:opacity-80 transition-colors font-body-md text-body-md block" href="/contact">Contact</a>
-</nav>
-</div>
-</header>
+<body class="bg-surface text-on-background font-body-md min-h-screen">
+<Header />
 <main class="w-full pt-32 pb-stack-lg px-margin-mobile md:px-gutter max-w-container-max mx-auto">
 <!-- Hero Section -->
-<section class="mb-stack-lg relative">
+<section class="mb-stack-lg relative fade-in">
 <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
 <div class="md:col-span-8">
 <h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-md text-primary">はじめまして。</h1>
 <p class="font-body-lg text-body-lg text-text-secondary leading-relaxed mb-stack-md max-w-2xl">
-                        日々の仕事や学びのプロセスで得た「より良く生きるための知恵」や「学習の効率化」について発信しています。
-                    </p>
+日々の仕事や学びのプロセスで得た「より良く生きるための知恵」や「学習の効率化」について発信しています。
+</p>
 <div class="flex items-center gap-3">
-<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm">
+<a href="/about/#ai-writing" title="このブログの執筆方針について" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm hover:scale-105 hover:shadow-md transition-all duration-300">
 <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
-                            AIによる執筆
-                            <button class="ml-1 opacity-60 hover:opacity-100 transition-opacity" id="ai-chip-close-btn"><span class="material-symbols-outlined text-[14px]">close</span></button>
-</div>
+AIによる執筆について
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
 </div>
 </div>
 <div class="md:col-span-4 hidden md:block">
 <div class="aspect-square rounded-full glass-card overflow-hidden p-2">
-<img alt="Profile" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida/ADBb0uiVield4zzxo9HvCZ6adgZ2AjGIlhSlbpC81mLqN0oyauHxItTMrN1fzeh1DpkOAiYcz_C42sBJO10gDZDknH9GeLXwFX_l-gtJZQo5BbXeMxY2IuB3avgInx7pqD5P1XPWJZPWxnXkGd7XGm2lVES02HIJIKfFRIjcrHcHMN2t8gicJ33Z0cIhFxs5PBraCCo6WzH9zERp1bRt3kuswmk9wrGzmyBOzfapdZS5u7E9qtyU_y_YM4zqYz0">
+<Image src={profileImage} alt="フィールドノート" class="w-full h-full object-cover rounded-full" />
 </div>
 </div>
 </div>
@@ -209,197 +78,55 @@
 <a href="/nursing" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Nursing</a>
 <a href="/lifehack" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Lifehack</a>
 </nav>
-<!-- Articles Bento Grid -->
+<!-- Articles Bento Grid (content collections から自動生成) -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 <!-- Featured Card -->
-<a href="/lifehack/burnout-natural-living/" class="lg:col-span-2 block">
+<a href={`/${featured.cat}/${featured.post.id}/`} class="lg:col-span-2 block">
 <article class="glass-card rounded-xl p-8 antigravity-float flex flex-col justify-between h-full">
 <div>
 <div class="flex justify-between items-start mb-6">
-<span class="px-3 py-1 rounded bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">LIFEHACK</span>
-<span class="text-text-secondary font-label-sm text-label-sm">2026年5月25日</span>
+<span class={`px-3 py-1 rounded ${catMeta[featured.cat].badge} font-label-sm text-label-sm`}>{catMeta[featured.cat].label}</span>
+<span class="text-text-secondary font-label-sm text-label-sm">{fmtDate(featured.post.data.pubDate)}</span>
 </div>
-<h2 class="font-headline-lg text-headline-lg mb-4 text-text-primary">頑張りすぎると病気になる——Utsuさんの活動休止と、自然に沿った生き方</h2>
+<h2 class="font-headline-lg text-headline-lg mb-4 text-text-primary">{featured.post.data.title}</h2>
+<p class="text-text-secondary text-body-md mb-4 leading-relaxed">{featured.post.data.description}</p>
+{featured.post.data.tags && featured.post.data.tags.length > 0 && (
 <div class="flex flex-wrap gap-2 mb-6">
-<span class="text-primary font-label-sm text-label-sm">#健康</span>
-<span class="text-primary font-label-sm text-label-sm">#生き方</span>
-<span class="text-primary font-label-sm text-label-sm">#仕事</span>
+{featured.post.data.tags.map((tag) => <span class="text-primary font-label-sm text-label-sm">#{tag}</span>)}
 </div>
+)}
 </div>
+{featured.post.data.heroImage && (
 <div class="w-full h-48 rounded-lg overflow-hidden mt-4">
-<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvykZUQh3eLqUKi-S8dD1pawCRmatI_JGTN0SBIpmcPn5WxpWQOEooRHeQTCv34dOW_RLbuP1fSKYT6s2KbRWFQRY13G3iY-rna5tk4G5onHbzrdGpd2BONLucI-wzWQzjWPpTALc4oaEGoTkux_e5O7tw7DmDnmo2Dcafbt2FA-m_xRFRxbUOu8bDY8PVUEiY3uIZraEVrfv3q0aVfuxTGodUtacgIH3-Y6zJwoe8IMzlSL_bld-IynMS0k8NTu56q32ioW7ieZie">
+<Image src={featured.post.data.heroImage} alt={featured.post.data.title} class="w-full h-full object-cover" />
 </div>
+)}
 </article>
 </a>
-<!-- Card 2 -->
-<a href="/nursing/nursing-dx-medical-fee-revision/" class="block">
+{rest.map((e) => (
+<a href={`/${e.cat}/${e.post.id}/`} class="block">
 <article class="glass-card rounded-xl p-6 antigravity-float flex flex-col h-full">
 <div class="flex justify-between items-start mb-4">
-<span class="px-3 py-1 rounded bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm">NURSING</span>
-<span class="text-text-secondary font-label-sm text-label-sm">2026年5月24日</span>
+<span class={`px-3 py-1 rounded ${catMeta[e.cat].badge} font-label-sm text-label-sm`}>{catMeta[e.cat].label}</span>
+<span class="text-text-secondary font-label-sm text-label-sm">{fmtDate(e.post.data.pubDate)}</span>
 </div>
-<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">【令和8年度改定】医療DXによる急性期看護配置基準の柔軟化と現場への影響</h3>
+<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">{e.post.data.title}</h3>
+{e.post.data.heroImage && (
+<div class="w-full h-32 rounded-lg overflow-hidden mb-4">
+<Image src={e.post.data.heroImage} alt={e.post.data.title} class="w-full h-full object-cover" />
+</div>
+)}
+{e.post.data.tags && e.post.data.tags.length > 0 && (
 <div class="mt-auto pt-4 flex flex-wrap gap-2 border-t border-border-subtle">
-<span class="text-text-secondary font-label-sm text-label-sm">#DX</span>
-<span class="text-text-secondary font-label-sm text-label-sm">#医療情勢</span>
+{e.post.data.tags.map((tag) => <span class="text-text-secondary font-label-sm text-label-sm">#{tag}</span>)}
 </div>
+)}
 </article>
 </a>
-<!-- Card 3 -->
-<a href="/nursing/nursing-career-beyond-graduation/" class="block">
-<article class="glass-card rounded-xl p-6 antigravity-float flex flex-col h-full">
-<div class="flex justify-between items-start mb-4">
-<span class="px-3 py-1 rounded bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm">NURSING</span>
-<span class="text-text-secondary font-label-sm text-label-sm">2026年5月22日</span>
-</div>
-<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">「看護師になること」を目標にしてはいけない</h3>
-<div class="mt-auto pt-4 flex flex-wrap gap-2 border-t border-border-subtle">
-<span class="text-text-secondary font-label-sm text-label-sm">#キャリア</span>
-<span class="text-text-secondary font-label-sm text-label-sm">#目標設定</span>
-</div>
-</article>
-</a>
-<!-- Card 4 -->
-<a href="/lifehack/orcan-index-invest-start/" class="block">
-<article class="glass-card rounded-xl p-6 antigravity-float flex flex-col h-full">
-<div class="flex justify-between items-start mb-4">
-<span class="px-3 py-1 rounded bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">LIFEHACK</span>
-<span class="text-text-secondary font-label-sm text-label-sm">2026年5月20日</span>
-</div>
-<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">オルカンで投資をはじめた。月10万円、夫婦で積み立てるだけ</h3>
-<div class="mt-auto pt-4 flex flex-wrap gap-2 border-t border-border-subtle">
-<span class="text-text-secondary font-label-sm text-label-sm">#投資</span>
-<span class="text-text-secondary font-label-sm text-label-sm">#資産形成</span>
-</div>
-</article>
-</a>
-<!-- Card 5 -->
-<a href="/diary/tokyo-walk/" class="block">
-<article class="glass-card rounded-xl p-6 antigravity-float flex flex-col h-full justify-between">
-<div>
-<div class="flex justify-between items-start mb-4">
-<span class="px-3 py-1 rounded bg-surface-variant text-on-surface-variant font-label-sm text-label-sm">DIARY</span>
-<span class="text-text-secondary font-label-sm text-label-sm">2026年5月26日</span>
-</div>
-<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">初夏の東京散歩——千代田区・神田錦町</h3>
-</div>
-<div class="w-full h-32 rounded-lg overflow-hidden my-3">
-<img class="w-full h-full object-cover" src="/tokyo-walk.jpg" alt="初夏の東京散歩">
-</div>
-<div class="mt-auto pt-4 flex flex-wrap gap-2 border-t border-border-subtle">
-<span class="text-text-secondary font-label-sm text-label-sm">#日常</span>
-<span class="text-text-secondary font-label-sm text-label-sm">#東京</span>
-<span class="text-text-secondary font-label-sm text-label-sm">#散歩</span>
-</div>
-</article>
-</a>
-<!-- Card 6 -->
-<a href="/english/toeic-905-what-matters/" class="lg:col-span-2 block">
-<article class="glass-card rounded-xl p-6 antigravity-float flex flex-col h-full">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
-<div class="flex flex-col justify-between h-full">
-<div>
-<div class="flex justify-between items-start mb-4">
-<span class="px-3 py-1 rounded bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm">ENGLISH</span>
-<span class="text-text-secondary font-label-sm text-label-sm">2026年5月16日</span>
-</div>
-<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">TOEIC 905点。でも「英語ができる」は目的じゃない</h3>
-<p class="text-text-secondary text-body-md mb-4 leading-relaxed">目標スコア達成後の実務で感じた、言語学習の本質的な価値について振り返ります。</p>
-</div>
-<div class="flex flex-wrap gap-2 mt-auto">
-<span class="text-text-secondary font-label-sm text-label-sm">#TOEIC</span>
-<span class="text-text-secondary font-label-sm text-label-sm">#英語学習</span>
-</div>
-</div>
-<div class="hidden md:block rounded-lg overflow-hidden h-full">
-<img class="w-full h-full object-cover min-h-[140px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRrHfdfC4O-yBbIOphyMQJG0k6WVBfk-b9PAzOHHI1m0Yw-bBuQIVN-L2oTJes5j2IVcgWz7cdWUAxiQYvAZSgLp_4rsGwHgKteNblAPrKSQQXgdYu6G8LGszCl2r1ULmCVbjhwEUMZPNYr55qurH4cwAqtkiyWOy3fQ4JlZlPQBW5AhglZju_1PS1bD6QgP5r9bSbklHuJ4HNfgJ8mAwcOs-9Kvc2MQHwt4HsYfdnnwKuwI9TFh96tiDgPhNzNKCOJIJ87eSK2ZMo">
-</div>
-</div>
-</article>
-</a>
-<!-- Card 7 -->
-<a href="/lifehack/amazon-gemini-book-preview/" class="block">
-<article class="glass-card rounded-xl p-6 antigravity-float flex flex-col h-full">
-<div class="flex justify-between items-start mb-4">
-<span class="px-3 py-1 rounded bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">LIFEHACK</span>
-<span class="text-text-secondary font-label-sm text-label-sm">2026年5月12日</span>
-</div>
-<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">Amazonとgeminiで、気になる本の中身を無料でのぞく方法</h3>
-<div class="mt-auto pt-4 flex flex-wrap gap-2 border-t border-border-subtle">
-<span class="text-text-secondary font-label-sm text-label-sm">#AI</span>
-<span class="text-text-secondary font-label-sm text-label-sm">#読書</span>
-</div>
-</article>
-</a>
+))}
 </div>
 <!-- Tags Cloud Section -->
 <section class="mt-stack-lg border-t border-border-subtle pt-12"><h2 class="font-headline-md text-headline-md mb-8 flex items-center gap-2"><span class="material-symbols-outlined text-primary">grid_view</span>Categories</h2><div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-12"><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-primary text-on-primary antigravity-float text-center gap-3 shadow-[0px_10px_40px_rgba(0,0,0,0.04)] border border-primary/10" href="/nursing"><span class="material-symbols-outlined text-3xl">medical_services</span><span class="font-headline-md">Nursing</span></a><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-secondary-container text-on-secondary-container antigravity-float glass-card text-center gap-3" href="/lifehack"><span class="material-symbols-outlined text-3xl">tips_and_updates</span><span class="font-headline-md">Lifehack</span></a><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed-variant antigravity-float glass-card text-center gap-3" href="/english"><span class="material-symbols-outlined text-3xl">language</span><span class="font-headline-md">English</span></a><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-surface-variant text-on-surface-variant antigravity-float glass-card text-center gap-3" href="/study"><span class="material-symbols-outlined text-3xl">menu_book</span><span class="font-headline-md">Study</span></a><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-primary-fixed text-on-primary-fixed-variant antigravity-float glass-card text-center gap-3" href="/diary"><span class="material-symbols-outlined text-3xl">auto_stories</span><span class="font-headline-md">Diary</span></a></div><div class="border-t border-border-subtle pt-8"><h3 class="font-label-sm text-label-sm text-text-secondary uppercase tracking-widest mb-6">Other Topics</h3><div class="flex flex-wrap gap-2"><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/AI/">#AI</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/DX/">#DX</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/PayPay/">#PayPay</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/SNS/">#SNS</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/TOEIC/">#TOEIC</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/キャリア/">#キャリア</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/健康/">#健康</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/医療情勢/">#医療情勢</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/将来性/">#将来性</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/投資/">#投資</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/旅行/">#旅行</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/生き方/">#生き方</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/節約/">#節約</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/越境学習/">#越境学習</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/資産形成/">#資産形成</a></div></div></section>
 </main>
-<!-- Footer -->
-<footer class="w-full py-12 mt-stack-lg bg-surface-container-lowest border-t border-border-subtle">
-<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-2 gap-8">
-<div>
-<h2 class="font-headline-md text-headline-md text-primary mb-4">フィールドノート</h2>
-<p class="font-label-sm text-label-sm text-text-secondary opacity-80 mb-6">© 2026 フィールドノート. Precision in Care, Clarity in Learning.</p>
-<div class="flex gap-4">
-<a class="text-text-secondary hover:text-primary transition-all duration-300" href="#"><span class="material-symbols-outlined">public</span></a>
-<a class="text-text-secondary hover:text-primary transition-all duration-300" href="#"><span class="material-symbols-outlined">share</span></a>
-</div>
-</div>
-<div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-<div class="flex flex-col gap-2">
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/diary">Diary</a>
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/english">English</a>
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/study">Study</a>
-</div>
-<div class="flex flex-col gap-2">
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/reading">Reading</a>
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/nursing">Nursing</a>
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/lifehack">Lifehack</a>
-</div>
-<div class="flex flex-col gap-2">
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/about">About</a>
-<a class="font-label-sm text-label-sm text-text-secondary hover:text-primary transition-all hover:underline" href="/contact">Contact</a>
-</div>
-</div>
-</div>
-</footer>
-<!-- FAB for quick action -->
-<button class="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-primary text-on-primary shadow-xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95 z-50">
-<span class="material-symbols-outlined text-[28px]">edit</span>
-</button>
-<script is:inline>
-        // Subtle micro-interaction: Header scroll effect
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('header');
-            if (window.scrollY > 20) {
-                header.classList.add('shadow-lg');
-            } else {
-                header.classList.remove('shadow-lg');
-            }
-        });
-
-        // Mobile menu toggle
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        if (mobileMenuBtn && mobileMenu) {
-            mobileMenuBtn.addEventListener('click', () => {
-                const isOpen = !mobileMenu.classList.contains('hidden');
-                mobileMenu.classList.toggle('hidden');
-                const icon = mobileMenuBtn.querySelector('.material-symbols-outlined');
-                if (icon) icon.textContent = isOpen ? 'menu' : 'close';
-            });
-        }
-
-        // AI Chip close logic
-        const closeBtn = document.getElementById('ai-chip-close-btn');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', (e) => {
-                const parent = e.currentTarget.parentElement;
-                parent.style.transition = 'opacity 0.3s ease';
-                parent.style.opacity = '0';
-                setTimeout(() => parent.remove(), 300);
-            });
-        }
-    </script>
+<Footer />
 </body></html>

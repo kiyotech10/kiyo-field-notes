@@ -6,15 +6,22 @@ import HeaderLink from './HeaderLink.astro';
 <header class="fixed top-0 w-full z-50 bg-surface-glass backdrop-blur-xl border-b border-border-subtle shadow-[0px_10px_40px_rgba(0,0,0,0.04)] transition-all duration-300">
 	<div class="max-w-[1100px] mx-auto px-6 flex justify-between items-center h-16">
 		<a class="font-headline-md text-headline-md text-primary tracking-tight font-bold hover:opacity-85 transition-opacity truncate mr-4" href="/">{SITE_TITLE}</a>
-		<nav class="hidden md:flex space-x-6 shrink-0">
-			<HeaderLink href="/diary" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Diary</HeaderLink>
-			<HeaderLink href="/study" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Study</HeaderLink>
-			<HeaderLink href="/nursing" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Nursing</HeaderLink>
-			<HeaderLink href="/lifehack" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Lifehack</HeaderLink>
-			<HeaderLink href="/reading" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Reading</HeaderLink>
-			<HeaderLink href="/about" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">About</HeaderLink>
-			<HeaderLink href="/contact" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Contact</HeaderLink>
-		</nav>
+		<div class="hidden md:flex items-center gap-6 shrink-0">
+			<nav class="flex space-x-6">
+				<HeaderLink href="/diary" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Diary</HeaderLink>
+				<HeaderLink href="/study" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Study</HeaderLink>
+				<HeaderLink href="/nursing" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Nursing</HeaderLink>
+				<HeaderLink href="/lifehack" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Lifehack</HeaderLink>
+				<HeaderLink href="/reading" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Reading</HeaderLink>
+				<HeaderLink href="/about" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">About</HeaderLink>
+				<HeaderLink href="/contact" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Contact</HeaderLink>
+			</nav>
+			<div class="relative" id="site-search">
+				<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-[20px] pointer-events-none">search</span>
+				<input id="site-search-input" type="text" placeholder="検索..." autocomplete="off" aria-label="記事を検索" class="well-input pl-10 pr-4 py-1.5 rounded-full text-body-md w-40 focus:w-56" />
+				<div id="site-search-results" class="hidden absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto glass-card rounded-xl shadow-xl border border-border-subtle py-2 z-50"></div>
+			</div>
+		</div>
 		<button id="mobile-menu-btn" class="md:hidden p-2 -mr-1 rounded-lg text-text-secondary hover:bg-black/5 transition-colors shrink-0" aria-label="メニュー">
 			<span class="material-symbols-outlined" style="vertical-align:middle;font-size:24px">menu</span>
 		</button>
@@ -52,6 +59,45 @@ import HeaderLink from './HeaderLink.astro';
 			if (icon) icon.textContent = isOpen ? 'menu' : 'close';
 		});
 	}
+
+	// 記事検索: /search.json をクライアント側でフィルタリング
+	(function () {
+		const input = document.getElementById('site-search-input');
+		const results = document.getElementById('site-search-results');
+		if (!input || !results) return;
+		let data = null;
+		const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+		async function load() {
+			if (data) return data;
+			try { data = await (await fetch('/search.json')).json(); } catch (e) { data = []; }
+			return data;
+		}
+		function render(items) {
+			if (!items.length) {
+				results.innerHTML = '<p class="px-4 py-2 text-xs text-text-secondary">該当する記事がありません</p>';
+			} else {
+				results.innerHTML = items.map((p) =>
+					'<a href="' + p.url + '" class="block px-4 py-2 hover:bg-black/5 transition-colors">' +
+					'<span class="block text-sm text-text-primary font-semibold truncate">' + esc(p.title) + '</span>' +
+					'<span class="block text-[11px] text-text-secondary uppercase tracking-wider">' + esc(p.category) + '</span></a>'
+				).join('');
+			}
+			results.classList.remove('hidden');
+		}
+		input.addEventListener('focus', load);
+		input.addEventListener('input', async () => {
+			const q = input.value.trim().toLowerCase();
+			if (!q) { results.classList.add('hidden'); results.innerHTML = ''; return; }
+			const all = await load();
+			const hits = all.filter((p) =>
+				(p.title + ' ' + p.description + ' ' + (p.tags || []).join(' ')).toLowerCase().includes(q)
+			).slice(0, 8);
+			render(hits);
+		});
+		document.addEventListener('click', (e) => {
+			if (!e.target.closest('#site-search')) results.classList.add('hidden');
+		});
+	})();
 </script>
 
 <style>
