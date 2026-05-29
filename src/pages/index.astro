@@ -5,7 +5,6 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
-import profileImage from '../assets/blog-placeholder-about.jpg';
 
 const categories = ['diary', 'english', 'study', 'reading', 'nursing', 'lifehack'] as const;
 type Cat = (typeof categories)[number];
@@ -49,9 +48,9 @@ const fmtDate = (d: Date) =>
 <section class="mb-stack-lg relative fade-in">
 <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
 <div class="md:col-span-8">
-<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-md text-primary">はじめまして。</h1>
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-md text-primary">こんにちは。</h1>
 <p class="font-body-lg text-body-lg text-text-secondary leading-relaxed mb-stack-md max-w-2xl">
-日々の仕事や学びのプロセスで得た「より良く生きるための知恵」や「学習の効率化」について発信しています。
+看護師として働きながら、英語の勉強やお金のこと、その日に考えたことを書きとめています。誰かのちょっとしたヒントになればうれしいです。
 </p>
 <div class="flex items-center gap-3">
 <a href="/about/#ai-writing" title="このブログの執筆方針について" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm hover:scale-105 hover:shadow-md transition-all duration-300">
@@ -62,8 +61,8 @@ AIによる執筆について
 </div>
 </div>
 <div class="md:col-span-4 hidden md:block">
-<div class="aspect-square rounded-full glass-card overflow-hidden p-2">
-<Image src={profileImage} alt="フィールドノート" class="w-full h-full object-cover rounded-full" />
+<div class="aspect-square rounded-full bg-gradient-to-br from-primary-fixed via-secondary-container to-surface-container flex items-center justify-center shadow-[0_20px_50px_rgba(39,97,131,0.12)] border border-white/50">
+<span class="material-symbols-outlined text-primary" style="font-size:96px; font-variation-settings: 'FILL' 0, 'wght' 250;">edit_note</span>
 </div>
 </div>
 </div>
