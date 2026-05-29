@@ -9,17 +9,17 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 const categories = ['diary', 'english', 'study', 'reading', 'nursing', 'lifehack'] as const;
 type Cat = (typeof categories)[number];
 
-const catMeta: Record<Cat, { label: string; badge: string }> = {
-	diary:    { label: 'DIARY',    badge: 'bg-surface-variant text-on-surface-variant' },
-	english:  { label: 'ENGLISH',  badge: 'bg-tertiary-fixed text-on-tertiary-fixed-variant' },
-	study:    { label: 'STUDY',    badge: 'bg-primary-fixed text-on-primary-fixed-variant' },
-	reading:  { label: 'READING',  badge: 'bg-secondary-container text-on-secondary-container' },
-	nursing:  { label: 'NURSING',  badge: 'bg-primary-fixed text-on-primary-fixed-variant' },
-	lifehack: { label: 'LIFEHACK', badge: 'bg-secondary-container text-on-secondary-container' },
+const catLabel: Record<Cat, string> = {
+	diary: 'Diary',
+	english: 'English',
+	study: 'Study',
+	reading: 'Reading',
+	nursing: 'Nursing',
+	lifehack: 'Lifehack',
 };
 
-// 全カテゴリの記事を集約し、公開日の新しい順に並べる（ハードコードを廃止し新着が自動反映されるように）
-const all = (
+// 全カテゴリの記事を集約し、公開日の新しい順に並べる
+const posts = (
 	await Promise.all(
 		categories.map(async (cat) =>
 			(await getCollection(cat)).map((post) => ({ cat, post })),
@@ -28,10 +28,6 @@ const all = (
 )
 	.flat()
 	.sort((a, b) => b.post.data.pubDate.valueOf() - a.post.data.pubDate.valueOf());
-
-// 注目記事（featured 指定があれば最新のものを、なければ全体の最新を大カードに）
-const featured = all.find((e) => e.post.data.featured) ?? all[0];
-const rest = all.filter((e) => e !== featured);
 
 const fmtDate = (d: Date) =>
 	d.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -43,89 +39,41 @@ const fmtDate = (d: Date) =>
 </head>
 <body class="bg-surface text-on-background font-body-md min-h-screen">
 <Header />
-<main class="w-full pt-32 pb-stack-lg px-margin-mobile md:px-gutter max-w-container-max mx-auto">
-<!-- Hero Section -->
-<section class="mb-stack-lg relative fade-in">
-<div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-<div class="md:col-span-8">
-<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-stack-md text-primary">こんにちは。</h1>
-<p class="font-body-lg text-body-lg text-text-secondary leading-relaxed mb-stack-md max-w-2xl">
-看護師として働きながら、英語の勉強やお金のこと、その日に考えたことを書きとめています。誰かのちょっとしたヒントになればうれしいです。
-</p>
-<div class="flex items-center gap-3">
-<a href="/about/#ai-writing" title="このブログの執筆方針について" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm hover:scale-105 hover:shadow-md transition-all duration-300">
-<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
-AIによる執筆について
-<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
-</a>
-</div>
-</div>
-<div class="md:col-span-4 hidden md:block">
-<div class="aspect-square rounded-full bg-gradient-to-br from-primary-fixed via-secondary-container to-surface-container flex items-center justify-center shadow-[0_20px_50px_rgba(39,97,131,0.12)] border border-white/50">
-<span class="material-symbols-outlined text-primary" style="font-size:96px; font-variation-settings: 'FILL' 0, 'wght' 250;">edit_note</span>
-</div>
-</div>
-</div>
-</section>
-<!-- Categories Filter -->
-<nav class="mb-stack-md flex flex-wrap gap-2">
-<span class="px-6 py-2 rounded-full bg-primary text-on-primary font-label-sm text-label-sm shadow-lg">All</span>
-<a href="/diary" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Diary</a>
-<a href="/english" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">English</a>
-<a href="/study" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Study</a>
-<a href="/reading" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Reading</a>
-<a href="/nursing" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Nursing</a>
-<a href="/lifehack" class="px-6 py-2 rounded-full bg-white/50 border border-border-subtle text-text-secondary font-label-sm text-label-sm hover:bg-surface-container transition-colors">Lifehack</a>
-</nav>
-<!-- Articles Bento Grid (content collections から自動生成) -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-<!-- Featured Card -->
-<a href={`/${featured.cat}/${featured.post.id}/`} class="lg:col-span-2 block">
-<article class="glass-card rounded-xl p-8 antigravity-float flex flex-col justify-between h-full">
-<div>
-<div class="flex justify-between items-start mb-6">
-<span class={`px-3 py-1 rounded ${catMeta[featured.cat].badge} font-label-sm text-label-sm`}>{catMeta[featured.cat].label}</span>
-<span class="text-text-secondary font-label-sm text-label-sm">{fmtDate(featured.post.data.pubDate)}</span>
-</div>
-<h2 class="font-headline-lg text-headline-lg mb-4 text-text-primary">{featured.post.data.title}</h2>
-<p class="text-text-secondary text-body-md mb-4 leading-relaxed">{featured.post.data.description}</p>
-{featured.post.data.tags && featured.post.data.tags.length > 0 && (
-<div class="flex flex-wrap gap-2 mb-6">
-{featured.post.data.tags.map((tag) => <span class="text-primary font-label-sm text-label-sm">#{tag}</span>)}
-</div>
-)}
-</div>
-{featured.post.data.heroImage && (
-<div class="w-full h-48 rounded-lg overflow-hidden mt-4">
-<Image src={featured.post.data.heroImage} alt={featured.post.data.title} class="w-full h-full object-cover" />
-</div>
-)}
-</article>
-</a>
-{rest.map((e) => (
-<a href={`/${e.cat}/${e.post.id}/`} class="block">
-<article class="glass-card rounded-xl p-6 antigravity-float flex flex-col h-full">
-<div class="flex justify-between items-start mb-4">
-<span class={`px-3 py-1 rounded ${catMeta[e.cat].badge} font-label-sm text-label-sm`}>{catMeta[e.cat].label}</span>
-<span class="text-text-secondary font-label-sm text-label-sm">{fmtDate(e.post.data.pubDate)}</span>
-</div>
-<h3 class="font-headline-md text-headline-md mb-3 text-text-primary">{e.post.data.title}</h3>
-{e.post.data.heroImage && (
-<div class="w-full h-32 rounded-lg overflow-hidden mb-4">
-<Image src={e.post.data.heroImage} alt={e.post.data.title} class="w-full h-full object-cover" />
-</div>
-)}
-{e.post.data.tags && e.post.data.tags.length > 0 && (
-<div class="mt-auto pt-4 flex flex-wrap gap-2 border-t border-border-subtle">
-{e.post.data.tags.map((tag) => <span class="text-text-secondary font-label-sm text-label-sm">#{tag}</span>)}
-</div>
-)}
-</article>
-</a>
-))}
-</div>
-<!-- Tags Cloud Section -->
-<section class="mt-stack-lg border-t border-border-subtle pt-12"><h2 class="font-headline-md text-headline-md mb-8 flex items-center gap-2"><span class="material-symbols-outlined text-primary">grid_view</span>Categories</h2><div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-12"><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-primary text-on-primary antigravity-float text-center gap-3 shadow-[0px_10px_40px_rgba(0,0,0,0.04)] border border-primary/10" href="/nursing"><span class="material-symbols-outlined text-3xl">medical_services</span><span class="font-headline-md">Nursing</span></a><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-secondary-container text-on-secondary-container antigravity-float glass-card text-center gap-3" href="/lifehack"><span class="material-symbols-outlined text-3xl">tips_and_updates</span><span class="font-headline-md">Lifehack</span></a><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed-variant antigravity-float glass-card text-center gap-3" href="/english"><span class="material-symbols-outlined text-3xl">language</span><span class="font-headline-md">English</span></a><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-surface-variant text-on-surface-variant antigravity-float glass-card text-center gap-3" href="/study"><span class="material-symbols-outlined text-3xl">menu_book</span><span class="font-headline-md">Study</span></a><a class="flex flex-col items-center justify-center p-6 rounded-xl bg-primary-fixed text-on-primary-fixed-variant antigravity-float glass-card text-center gap-3" href="/diary"><span class="material-symbols-outlined text-3xl">auto_stories</span><span class="font-headline-md">Diary</span></a></div><div class="border-t border-border-subtle pt-8"><h3 class="font-label-sm text-label-sm text-text-secondary uppercase tracking-widest mb-6">Other Topics</h3><div class="flex flex-wrap gap-2"><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/AI/">#AI</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/DX/">#DX</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/PayPay/">#PayPay</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/SNS/">#SNS</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/TOEIC/">#TOEIC</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/キャリア/">#キャリア</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/健康/">#健康</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/医療情勢/">#医療情勢</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/将来性/">#将来性</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/投資/">#投資</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/旅行/">#旅行</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/生き方/">#生き方</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/節約/">#節約</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/越境学習/">#越境学習</a><a class="px-3 py-1 rounded-full bg-white/30 border border-border-subtle text-text-secondary text-label-sm hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors" href="/tags/資産形成/">#資産形成</a></div></div></section>
+<main class="w-full pt-28 md:pt-32 pb-20 px-5 max-w-[720px] mx-auto">
+	<!-- Intro -->
+	<section class="mb-12 md:mb-16">
+		<h1 class="text-2xl md:text-[32px] font-bold text-text-primary leading-snug mb-4">こんにちは。</h1>
+		<p class="text-text-secondary leading-loose mb-4">
+			看護師として働きながら、英語の勉強やお金のこと、その日に考えたことを書きとめています。誰かのちょっとしたヒントになればうれしいです。
+		</p>
+		<a href="/about/#ai-writing" class="text-sm text-text-secondary underline underline-offset-4 hover:text-text-primary transition-colors">
+			この記事は生成AIで書いています →
+		</a>
+	</section>
+
+	<!-- Article list -->
+	<div class="border-t border-border-subtle">
+		{posts.map(({ cat, post }) => (
+			<a href={`/${cat}/${post.id}/`} class="group block py-9 border-b border-border-subtle">
+				{post.data.heroImage && (
+					<div class="mb-5 overflow-hidden rounded">
+						<Image src={post.data.heroImage} alt={post.data.title} class="w-full aspect-[16/9] object-cover" />
+					</div>
+				)}
+				<div class="flex items-center gap-2.5 text-xs text-text-secondary mb-2.5">
+					<span class="uppercase tracking-widest">{catLabel[cat]}</span>
+					<span class="text-border-subtle">/</span>
+					<time>{fmtDate(post.data.pubDate)}</time>
+				</div>
+				<h2 class="text-xl md:text-2xl font-bold text-text-primary leading-snug mb-2 group-hover:underline underline-offset-4 decoration-1">
+					{post.data.title}
+				</h2>
+				<p class="text-text-secondary leading-relaxed line-clamp-2">
+					{post.data.description}
+				</p>
+			</a>
+		))}
+	</div>
 </main>
 <Footer />
 </body></html>

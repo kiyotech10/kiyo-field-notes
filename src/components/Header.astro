@@ -3,31 +3,31 @@ import { SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
 ---
 
-<header class="fixed top-0 w-full z-50 bg-surface-glass backdrop-blur-xl border-b border-border-subtle shadow-[0px_10px_40px_rgba(0,0,0,0.04)] transition-all duration-300">
-	<div class="max-w-[1100px] mx-auto px-6 flex justify-between items-center h-16">
-		<a class="font-headline-md text-headline-md text-primary tracking-tight font-bold hover:opacity-85 transition-opacity truncate mr-4" href="/">{SITE_TITLE}</a>
-		<div class="hidden md:flex items-center gap-6 shrink-0">
-			<nav class="flex space-x-6">
-				<HeaderLink href="/diary" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Diary</HeaderLink>
-				<HeaderLink href="/study" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Study</HeaderLink>
-				<HeaderLink href="/nursing" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Nursing</HeaderLink>
-				<HeaderLink href="/lifehack" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Lifehack</HeaderLink>
-				<HeaderLink href="/reading" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Reading</HeaderLink>
-				<HeaderLink href="/about" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">About</HeaderLink>
-				<HeaderLink href="/contact" class="text-text-secondary hover:text-primary transition-colors font-body-md text-body-md">Contact</HeaderLink>
+<header class="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur border-b border-border-subtle">
+	<div class="max-w-[920px] mx-auto px-5 flex justify-between items-center h-14">
+		<a class="text-base text-text-primary tracking-tight font-bold hover:opacity-70 transition-opacity truncate mr-4" href="/">{SITE_TITLE}</a>
+		<div class="hidden md:flex items-center gap-5 shrink-0">
+			<nav class="flex space-x-5 text-sm">
+				<HeaderLink href="/diary" class="text-text-secondary hover:text-primary transition-colors">Diary</HeaderLink>
+				<HeaderLink href="/study" class="text-text-secondary hover:text-primary transition-colors">Study</HeaderLink>
+				<HeaderLink href="/nursing" class="text-text-secondary hover:text-primary transition-colors">Nursing</HeaderLink>
+				<HeaderLink href="/lifehack" class="text-text-secondary hover:text-primary transition-colors">Lifehack</HeaderLink>
+				<HeaderLink href="/reading" class="text-text-secondary hover:text-primary transition-colors">Reading</HeaderLink>
+				<HeaderLink href="/about" class="text-text-secondary hover:text-primary transition-colors">About</HeaderLink>
+				<HeaderLink href="/contact" class="text-text-secondary hover:text-primary transition-colors">Contact</HeaderLink>
 			</nav>
 			<div class="relative" id="site-search">
-				<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-[20px] pointer-events-none">search</span>
-				<input id="site-search-input" type="text" placeholder="検索..." autocomplete="off" aria-label="記事を検索" class="well-input pl-10 pr-4 py-1.5 rounded-full text-body-md w-40 focus:w-56" />
-				<div id="site-search-results" class="hidden absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto glass-card rounded-xl shadow-xl border border-border-subtle py-2 z-50"></div>
+				<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-text-secondary text-[18px] pointer-events-none">search</span>
+				<input id="site-search-input" type="text" placeholder="検索" autocomplete="off" aria-label="記事を検索" class="well-input pl-8 pr-3 py-1 rounded text-sm w-28 focus:w-44 transition-all" />
+				<div id="site-search-results" class="hidden absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto glass-card rounded py-2 z-50"></div>
 			</div>
 		</div>
 		<button id="mobile-menu-btn" class="md:hidden p-2 -mr-1 rounded-lg text-text-secondary hover:bg-black/5 transition-colors shrink-0" aria-label="メニュー">
 			<span class="material-symbols-outlined" style="vertical-align:middle;font-size:24px">menu</span>
 		</button>
 	</div>
-	<div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-xl border-t border-border-subtle shadow-lg">
-		<nav class="px-6 py-2 flex flex-col">
+	<div id="mobile-menu" class="hidden md:hidden bg-surface border-t border-border-subtle">
+		<nav class="max-w-[920px] mx-auto px-5 py-2 flex flex-col">
 			<HeaderLink href="/diary" class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block">Diary</HeaderLink>
 			<HeaderLink href="/study" class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block">Study</HeaderLink>
 			<HeaderLink href="/nursing" class="py-3 border-b border-border-subtle text-text-secondary hover:text-primary transition-colors font-body-md text-body-md block">Nursing</HeaderLink>
@@ -40,15 +40,6 @@ import HeaderLink from './HeaderLink.astro';
 </header>
 
 <script is:inline>
-	window.addEventListener('scroll', () => {
-		const header = document.querySelector('header');
-		if (window.scrollY > 20) {
-			header?.classList.add('shadow-lg');
-		} else {
-			header?.classList.remove('shadow-lg');
-		}
-	});
-
 	const mobileMenuBtn = document.getElementById('mobile-menu-btn');
 	const mobileMenu = document.getElementById('mobile-menu');
 	if (mobileMenuBtn && mobileMenu) {
@@ -102,7 +93,7 @@ import HeaderLink from './HeaderLink.astro';
 
 <style>
 	nav :global(a.active) {
-		color: #276183 !important;
-		font-weight: 600 !important;
+		color: #1a1a1a !important;
+		font-weight: 700 !important;
 	}
 </style>

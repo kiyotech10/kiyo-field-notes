@@ -1,8 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
 import Header from '../../components/Header.astro';
 import { SITE_TITLE } from '../../consts';
 
@@ -12,8 +12,10 @@ const posts = (await getCollection('study')).sort(
 
 const title = 'Study';
 const description = '試験勉強・資格取得のノート。';
----
 
+const fmtDate = (d: Date) =>
+	d.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+---
 <!doctype html>
 <html lang="ja">
 	<head>
@@ -21,52 +23,31 @@ const description = '試験勉強・資格取得のノート。';
 	</head>
 	<body class="bg-surface text-on-background font-body-md min-h-screen">
 		<Header />
-		<main class="w-full pt-32 pb-stack-lg px-margin-mobile md:px-gutter max-w-container-max mx-auto">
-			<div class="mb-12 relative fade-in">
-				<a href="/" class="inline-flex items-center gap-1.5 text-text-secondary hover:text-primary transition-colors text-xs font-semibold uppercase tracking-wider mb-4">
-					<span class="material-symbols-outlined text-[16px]">arrow_back</span>
-					Home
-				</a>
-				<h1 class="font-headline-lg text-headline-lg text-primary mb-3 flex items-center gap-2">
-					<span class="material-symbols-outlined text-3xl">menu_book</span>
-					{title}
-				</h1>
-				<p class="font-body-lg text-body-lg text-text-secondary leading-relaxed max-w-2xl">
-					{description}
-				</p>
+		<main class="w-full pt-28 md:pt-32 pb-20 px-5 max-w-[720px] mx-auto">
+			<div class="mb-10">
+				<a href="/" class="text-xs text-text-secondary uppercase tracking-widest hover:text-text-primary transition-colors">&larr; Home</a>
+				<h1 class="text-2xl md:text-[32px] font-bold text-text-primary mt-3 mb-2">{title}</h1>
+				<p class="text-text-secondary">{description}</p>
 			</div>
 
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-				{posts.map((post) => (
-					<a href={`/study/${post.id}/`} class="block group">
-						<article class="glass-card rounded-xl p-6 md:p-8 antigravity-float flex flex-col justify-between h-full border border-black/[0.05]">
-							<div>
-								<div class="flex justify-between items-center mb-4 text-xs text-text-secondary">
-									<span class="px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-semibold uppercase tracking-wider">
-										{title}
-									</span>
-									<time class="font-label-sm">
-										<FormattedDate date={post.data.pubDate} />
-									</time>
-								</div>
-								<h2 class="font-headline-md text-headline-md text-text-primary mb-3 group-hover:text-primary transition-colors line-clamp-2">
-									{post.data.title}
-								</h2>
-								<p class="text-text-secondary text-body-md leading-relaxed line-clamp-3 mb-4">
-									{post.data.description}
-								</p>
-							</div>
-							{post.data.tags && post.data.tags.length > 0 && (
-								<div class="flex flex-wrap gap-1.5 mt-auto pt-4 border-t border-border-subtle">
-									{post.data.tags.map((tag) => (
-										<span class="text-primary font-label-sm text-[11px]">#{tag}</span>
-									))}
+			{posts.length === 0 ? (
+				<p class="text-text-secondary py-10 border-t border-border-subtle">まだ記事がありません。</p>
+			) : (
+				<div class="border-t border-border-subtle">
+					{posts.map((post) => (
+						<a href={`/study/${post.id}/`} class="group block py-9 border-b border-border-subtle">
+							{post.data.heroImage && (
+								<div class="mb-5 overflow-hidden rounded">
+									<Image src={post.data.heroImage} alt={post.data.title} class="w-full aspect-[16/9] object-cover" />
 								</div>
 							)}
-						</article>
-					</a>
-				))}
-			</div>
+							<time class="block text-xs text-text-secondary mb-2.5">{fmtDate(post.data.pubDate)}</time>
+							<h2 class="text-xl md:text-2xl font-bold text-text-primary leading-snug mb-2 group-hover:underline underline-offset-4 decoration-1">{post.data.title}</h2>
+							<p class="text-text-secondary leading-relaxed line-clamp-2">{post.data.description}</p>
+						</a>
+					))}
+				</div>
+			)}
 		</main>
 		<Footer />
 	</body>

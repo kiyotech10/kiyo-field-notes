@@ -3,33 +3,23 @@ import { SITE_TITLE } from '../consts';
 const today = new Date();
 ---
 
-<footer class="w-full py-12 mt-16 bg-[#ffffff] border-t border-black/[0.05]">
-	<div class="max-w-[1100px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-		<div>
-			<h2 class="font-headline-md text-lg text-primary mb-3 font-bold">{SITE_TITLE}</h2>
-			<p class="text-xs text-text-secondary opacity-85 mb-1">仕事や勉強、日々の暮らしのメモ。</p>
-			<p class="text-xs text-text-secondary opacity-70 mb-4">© {today.getFullYear()} {SITE_TITLE}</p>
-		</div>
-		<div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-			<div class="flex flex-col gap-1.5">
-				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/diary">Diary</a>
-				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/english">English</a>
-				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/study">Study</a>
-			</div>
-			<div class="flex flex-col gap-1.5">
-				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/reading">Reading</a>
-				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/nursing">Nursing</a>
-				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/lifehack">Lifehack</a>
-			</div>
-			<div class="flex flex-col gap-1.5">
-				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/about">About</a>
-				<a class="text-xs text-text-secondary hover:text-primary transition-all hover:underline" href="/contact">Contact</a>
-			</div>
-		</div>
+<footer class="w-full py-12 mt-20 border-t border-border-subtle">
+	<div class="max-w-[720px] mx-auto px-5">
+		<nav class="flex flex-wrap gap-x-5 gap-y-2 mb-5 text-sm">
+			<a class="text-text-secondary hover:text-primary transition-colors" href="/diary">Diary</a>
+			<a class="text-text-secondary hover:text-primary transition-colors" href="/english">English</a>
+			<a class="text-text-secondary hover:text-primary transition-colors" href="/study">Study</a>
+			<a class="text-text-secondary hover:text-primary transition-colors" href="/reading">Reading</a>
+			<a class="text-text-secondary hover:text-primary transition-colors" href="/nursing">Nursing</a>
+			<a class="text-text-secondary hover:text-primary transition-colors" href="/lifehack">Lifehack</a>
+			<a class="text-text-secondary hover:text-primary transition-colors" href="/about">About</a>
+			<a class="text-text-secondary hover:text-primary transition-colors" href="/contact">Contact</a>
+		</nav>
+		<p class="text-xs text-text-secondary">© {today.getFullYear()} {SITE_TITLE}</p>
 	</div>
 </footer>
 
-<button id="back-to-top" class="fixed bottom-8 right-8 w-12 h-12 rounded-full bg-primary text-white shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 pointer-events-none opacity-0 z-50">
+<button id="back-to-top" aria-label="ページ上部へ戻る" class="fixed bottom-6 right-6 w-10 h-10 rounded-full bg-surface border border-border-subtle text-text-primary flex items-center justify-center hover:bg-surface-container active:scale-95 transition-all duration-200 pointer-events-none opacity-0 z-50">
 	<span class="material-symbols-outlined text-lg">arrow_upward</span>
 </button>
 
