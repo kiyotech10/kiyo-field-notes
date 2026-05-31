@@ -1,31 +1,31 @@
 #!/usr/bin/env python3
 """
-音声生成・動画合成スクリプト (open-jtalk版)
+音声生成・動画合成スクリプト (pyopenjtalk / mei女性音声版)
 Usage: python3 add_voice.py
 Output: borderline-intelligence-with-voice.mp4
 """
-import subprocess, wave, sys
+import wave, sys
 from pathlib import Path
 import numpy as np
+import pyopenjtalk
+import subprocess
 
 SCRIPT_DIR = Path(__file__).parent
 VIDEO_OUT  = SCRIPT_DIR / "borderline-intelligence-with-voice.mp4"
 TMP        = Path("/tmp/voice_segs")
 TMP.mkdir(exist_ok=True)
 
-# open-jtalk settings
-DIC   = "/var/lib/mecab/dic/open-jtalk/naist-jdic"
-VOICE = "/usr/share/hts-voice/nitech-jp-atr503-m001/nitech_jp_atr503_m001.htsvoice"
-RATE  = "0.95"   # speaking rate (1.0=normal, 0.9=slow)
-PITCH = "120"    # base frequency Hz
+# ── TTS settings ─────────────────────────────────────────────
+SPEED     = 1.05   # 1.0=普通, 1.1=少し速め
+HALF_TONE = 0.0    # ピッチ調整（半音単位, 0=デフォルト）
 
-W, H  = 1920, 1080
-FPS   = 30
-FADE  = 15        # fade frames between slides
-SR    = 48000     # open-jtalk actual output SR (auto-detected below)
-MIN_HOLD = 3      # minimum slide hold (seconds)
+# ── Video settings (make_video.py と一致させること) ───────────
+W, H   = 1920, 1080
+FPS    = 30
+FADE   = 15        # slides間のフェードフレーム数
+MIN_HOLD = 2.5     # スライド最低表示秒数
 
-# ── Narration texts ───────────────────────────────────────────
+# ── Narration ────────────────────────────────────────────────
 TEXTS = [
     # 1 HOOK
     "境界知能は、7人に1人いる。"
@@ -95,35 +95,12 @@ TEXTS = [
 
 # ── Audio helpers ─────────────────────────────────────────────
 
-def speak(text, out_wav):
-    proc = subprocess.run(
-        ["open_jtalk",
-         "-x", DIC, "-m", VOICE,
-         "-r", RATE, "-fm", PITCH,
-         "-u", "0.3",
-         "-ow", str(out_wav)],
-        input=text.encode("utf-8"),
-        capture_output=True
-    )
-    if proc.returncode != 0:
-        raise RuntimeError(f"open_jtalk failed: {proc.stderr.decode()}")
-
-def wav_to_arr(path):
-    with wave.open(str(path), "rb") as w:
-        sr = w.getframerate(); ch = w.getnchannels()
-        raw = w.readframes(w.getnframes())
-    arr = np.frombuffer(raw, dtype=np.int16).astype(np.float32)
-    if ch == 2:
-        arr = arr.reshape(-1, 2).mean(axis=1)
-    return arr, sr
-
-def arr_to_wav(arr, sr, path):
-    with wave.open(str(path), "wb") as w:
-        w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr)
-        w.writeframes(np.clip(arr, -32768, 32767).astype(np.int16).tobytes())
+def speak(text):
+    """pyopenjtalk (mei女性音声) で合成 → float32配列とSRを返す"""
+    x, sr = pyopenjtalk.tts(text, speed=SPEED, half_tone=HALF_TONE)
+    return np.array(x, dtype=np.float32), sr
 
 def trim_leading_silence(arr, sr, threshold=600, pad_ms=80):
-    """先頭の無音を除去し pad_ms だけ残す"""
     for i in range(len(arr)):
         if abs(arr[i]) > threshold:
             keep = max(0, i - int(pad_ms / 1000 * sr))
@@ -131,14 +108,11 @@ def trim_leading_silence(arr, sr, threshold=600, pad_ms=80):
     return arr
 
 def normalize(arr, target=29000):
-    """ピークを target (≈90% of 32768) に正規化"""
     peak = np.abs(arr).max()
-    if peak > 0:
-        arr = arr * (target / peak)
-    return arr
+    return arr * (target / peak) if peak > 0 else arr
 
-def fade_in_out(arr, ms=40):
-    n = int(ms / 1000 * SR)
+def fade_edges(arr, sr, ms=40):
+    n = int(ms / 1000 * sr)
     if len(arr) > n * 2:
         arr = arr.copy()
         arr[:n]  *= np.linspace(0, 1, n)
@@ -148,112 +122,99 @@ def fade_in_out(arr, ms=40):
 def silence(secs, sr):
     return np.zeros(int(secs * sr), dtype=np.float32)
 
-# ── Video helpers (same logic as make_video.py) ───────────────
-# Import slide generators from make_video.py
-import importlib.util, os
-_spec = importlib.util.spec_from_file_location("make_video", SCRIPT_DIR / "make_video.py")
-_mv   = importlib.util.load_from_spec(_spec) if False else None  # lazy
-
-def get_slide_images():
-    spec = importlib.util.spec_from_file_location("make_video", SCRIPT_DIR / "make_video.py")
-    mv = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mv)
-    return [(fn, hold) for fn, hold in mv.SLIDES], mv
+def arr_to_wav(arr, sr, path):
+    with wave.open(str(path), "wb") as w:
+        w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr)
+        w.writeframes(np.clip(arr, -32768, 32767).astype(np.int16).tobytes())
 
 # ── Main ──────────────────────────────────────────────────────
 
 def main():
-    # 1. Generate speech for all slides
-    print("Generating speech with open-jtalk...")
-    speech_arrs = []
-    speech_secs = []
+    # ── 1. 全スライドの音声を生成 ──────────────────────────────
+    print("Generating speech (mei / female)...")
+    speech_data = []   # list of (arr, sr, dur)
+
     for i, text in enumerate(TEXTS):
-        wav = TMP / f"seg{i:02d}.wav"
-        speak(text, wav)
-        arr, sr = wav_to_arr(wav)
+        arr, sr = speak(text)
         arr = trim_leading_silence(arr, sr)
         arr = normalize(arr)
-        arr = fade_in_out(arr)
-        speech_arrs.append((arr, sr))
+        arr = fade_edges(arr, sr)
         dur = len(arr) / sr
-        speech_secs.append(dur)
-        sys.stdout.write(f"  [{i+1:2d}/17] {dur:.1f}s  \"{text[:22]}...\"\n")
+        speech_data.append((arr, sr, dur))
+        sys.stdout.write(f"  [{i+1:2d}/17] {dur:.1f}s\n")
         sys.stdout.flush()
 
-    # 2. Determine hold time per slide = max(speech_dur + 0.3s buffer, MIN_HOLD)
-    holds = [max(s + 0.3, MIN_HOLD) for s in speech_secs]
-    holds[-1] = max(holds[-1], speech_secs[-1] + 1.0)  # extra pause at end
+    # ── 2. スライド尺を音声長に合わせて決定 ────────────────────
+    holds = [max(d + 0.4, MIN_HOLD) for _, _, d in speech_data]
+    holds[-1] += 1.0   # 最後のスライドは余韻を長めに
 
-    # 3. Regenerate video with new hold times
-    print("\nRegenerating video with speech-adjusted timing...")
+    # ── 3. 映像を再生成 ────────────────────────────────────────
+    print("\nRegenerating video slides...")
+    import importlib.util
     spec = importlib.util.spec_from_file_location("make_video", SCRIPT_DIR / "make_video.py")
     mv = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mv)
 
-    slide_fns = [fn for fn, _ in mv.SLIDES]
     images = []
-    for i, fn in enumerate(slide_fns):
-        sys.stdout.write(f"  Slide {i+1}/17\r")
-        sys.stdout.flush()
+    for i, (fn, _) in enumerate(mv.SLIDES):
+        sys.stdout.write(f"  Slide {i+1}/17\r"); sys.stdout.flush()
         images.append(np.array(fn()))
     print()
 
     silent_mp4 = TMP / "silent.mp4"
-    cmd = ["ffmpeg", "-y",
-           "-f", "rawvideo", "-vcodec", "rawvideo",
-           "-s", f"{mv.W}x{mv.H}", "-pix_fmt", "rgb24",
-           "-r", str(mv.FPS), "-i", "pipe:0",
-           "-vcodec", "libx264", "-pix_fmt", "yuv420p",
-           "-crf", "20", "-preset", "fast", str(silent_mp4)]
-    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    for i, (arr, hold) in enumerate(zip(images, holds)):
-        raw = arr.tobytes()
+    enc = subprocess.Popen([
+        "ffmpeg", "-y", "-f", "rawvideo", "-vcodec", "rawvideo",
+        "-s", f"{mv.W}x{mv.H}", "-pix_fmt", "rgb24", "-r", str(mv.FPS),
+        "-i", "pipe:0",
+        "-vcodec", "libx264", "-pix_fmt", "yuv420p",
+        "-crf", "20", "-preset", "fast", str(silent_mp4)
+    ], stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
+
+    for i, (img, hold) in enumerate(zip(images, holds)):
+        raw = img.tobytes()
         for _ in range(int(hold * mv.FPS)):
-            proc.stdin.write(raw)
+            enc.stdin.write(raw)
         if i < len(images) - 1:
             nxt = images[i + 1]
-            for fi in range(mv.FADE):
-                a = fi / mv.FADE
-                bl = ((1 - a) * arr + a * nxt).astype(np.uint8)
-                proc.stdin.write(bl.tobytes())
-    proc.stdin.close()
-    proc.wait()
+            for fi in range(FADE):
+                a = fi / FADE
+                bl = ((1 - a) * img + a * nxt).astype(np.uint8)
+                enc.stdin.write(bl.tobytes())
+    enc.stdin.close(); enc.wait()
 
-    # 4. Build full audio track aligned to video
+    # ── 4. 音声トラック構築 ────────────────────────────────────
     print("Building audio track...")
-    # 全セグメント結合後に再正規化（セグメント間の音量ばらつき解消）
-    all_audio = []
-    for i, ((arr, sr), hold) in enumerate(zip(speech_arrs, holds)):
-        # Pad speech with silence to fill the full slot
+    all_segs = []
+    for i, ((arr, sr, dur), hold) in enumerate(zip(speech_data, holds)):
         slot = hold + (FADE / mv.FPS if i < len(holds) - 1 else 0)
-        slot_n = int(slot * sr)
-        if len(arr) < slot_n:
-            arr = np.concatenate([arr, silence(slot - len(arr)/sr, sr)])
+        n = int(slot * sr)
+        if len(arr) < n:
+            arr = np.concatenate([arr, silence(slot - len(arr) / sr, sr)])
         else:
-            arr = arr[:slot_n]
-        all_audio.append(arr)
+            arr = arr[:n]
+        all_segs.append(arr)
 
-    full_audio = np.concatenate(all_audio)
-    full_audio = normalize(full_audio, target=29000)  # 全体を再正規化
-    audio_wav  = TMP / "full_audio.wav"
-    arr_to_wav(full_audio, SR, audio_wav)
+    full = np.concatenate(all_segs)
+    full = normalize(full, target=29000)
 
-    # 5. Merge video + audio
+    sr_out = speech_data[0][1]   # 全セグメント同SR
+    audio_wav = TMP / "full_audio.wav"
+    arr_to_wav(full, sr_out, audio_wav)
+
+    # ── 5. 映像＋音声を合成 ────────────────────────────────────
     print("Merging video + audio...")
     subprocess.run([
         "ffmpeg", "-y",
         "-i", str(silent_mp4),
         "-i", str(audio_wav),
-        "-c:v", "copy",
-        "-c:a", "aac", "-b:a", "128k",
-        "-shortest",
-        str(VIDEO_OUT)
+        "-c:v", "copy", "-c:a", "aac", "-b:a", "128k",
+        "-shortest", str(VIDEO_OUT)
     ], check=True, stderr=subprocess.DEVNULL)
 
+    total = sum(holds) + (len(holds) - 1) * FADE / mv.FPS
     mb = VIDEO_OUT.stat().st_size / 1024 / 1024
-    total = sum(holds) + (len(holds)-1) * FADE/mv.FPS
     print(f"\nDone → {VIDEO_OUT}")
-    print(f"Total duration: {total:.0f}s  Size: {mb:.1f} MB")
+    print(f"Duration: {total:.0f}s ({total/60:.1f}min)  Size: {mb:.1f}MB")
 
 if __name__ == "__main__":
     main()
