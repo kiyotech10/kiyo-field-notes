@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>境界知能は7人に1人 — 統計が先に決めた数字</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #090909;
+    color: #f0f0f0;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', sans-serif;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    user-select: none;
+  }
+
+  /* ── Slides ── */
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 8vw 10vw;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.7s ease;
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ── Background accents ── */
+  .slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(245,158,11,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ── Typography ── */
+  .label {
+    font-size: clamp(0.7rem, 1.5vw, 0.95rem);
+    letter-spacing: 0.22em;
+    color: #f59e0b;
+    margin-bottom: clamp(16px, 3vh, 28px);
+    font-weight: 600;
+  }
+
+  .main {
+    font-size: clamp(2rem, 5.5vw, 4.4rem);
+    font-weight: 900;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+
+  .sub {
+    font-size: clamp(1rem, 2.2vw, 1.5rem);
+    color: #9ca3af;
+    margin-top: clamp(16px, 2.5vh, 28px);
+    line-height: 1.8;
+    font-weight: 400;
+  }
+
+  .accent { color: #f59e0b; }
+  .dim { color: #4b5563; }
+
+  .big {
+    font-size: clamp(4rem, 13vw, 11rem);
+    font-weight: 900;
+    color: #f59e0b;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  /* ── IQ bar diagram ── */
+  .iq-diagram {
+    width: min(640px, 80vw);
+    margin: clamp(20px, 4vh, 40px) auto 0;
+  }
+  .iq-track {
+    height: 12px;
+    background: #1f2937;
+    border-radius: 99px;
+    position: relative;
+    overflow: visible;
+  }
+  .iq-fill {
+    position: absolute;
+    top: 0; bottom: 0;
+    background: #f59e0b;
+    border-radius: 99px;
+  }
+  .iq-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-size: clamp(0.7rem, 1.4vw, 0.9rem);
+    color: #6b7280;
+  }
+  .iq-center {
+    position: absolute;
+    top: -8px;
+    width: 2px;
+    height: 28px;
+    background: #374151;
+    left: 50%;
+  }
+  .iq-zone {
+    position: absolute;
+    top: -36px;
+    font-size: clamp(0.65rem, 1.3vw, 0.85rem);
+    color: #f59e0b;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    left: 38%;
+  }
+
+  /* ── Step list ── */
+  .steps {
+    list-style: none;
+    text-align: left;
+    width: min(620px, 82vw);
+    margin-top: clamp(20px, 4vh, 36px);
+  }
+  .steps li {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    padding: clamp(12px, 2vh, 18px) 0;
+    border-bottom: 1px solid #1f2937;
+    font-size: clamp(1rem, 2.3vw, 1.5rem);
+    line-height: 1.5;
+  }
+  .steps li:last-child { border-bottom: none; }
+  .step-n {
+    color: #f59e0b;
+    font-weight: 900;
+    font-size: 1.15em;
+    min-width: 2ch;
+    line-height: 1.5;
+  }
+
+  /* ── Chip row ── */
+  .chips {
+    display: flex;
+    gap: clamp(10px, 2vw, 18px);
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: clamp(20px, 4vh, 36px);
+  }
+  .chip {
+    background: #111827;
+    border: 1px solid #374151;
+    border-radius: 99px;
+    padding: clamp(8px,1.5vh,14px) clamp(18px,3vw,30px);
+    font-size: clamp(0.9rem, 1.9vw, 1.2rem);
+    color: #d1d5db;
+  }
+
+  /* ── Quote box ── */
+  .quote {
+    border-left: 4px solid #f59e0b;
+    background: rgba(245,158,11,0.05);
+    border-radius: 0 10px 10px 0;
+    padding: clamp(16px,3vh,28px) clamp(20px,4vw,36px);
+    text-align: left;
+    max-width: min(680px, 84vw);
+    margin-top: clamp(20px,4vh,36px);
+  }
+  .quote p {
+    font-size: clamp(1rem, 2.3vw, 1.5rem);
+    line-height: 1.85;
+    color: #e5e7eb;
+  }
+
+  /* ── Big question box ── */
+  .q-box {
+    border: 2px solid #f59e0b;
+    border-radius: 14px;
+    padding: clamp(20px,4vh,36px) clamp(24px,5vw,48px);
+    max-width: min(680px, 84vw);
+    margin-top: clamp(20px,4vh,36px);
+    background: rgba(245,158,11,0.04);
+  }
+  .q-box p {
+    font-size: clamp(1.1rem, 2.8vw, 2rem);
+    line-height: 1.6;
+    font-weight: 700;
+    color: #f0f0f0;
+  }
+
+  /* ── Progress bar ── */
+  #progress {
+    position: fixed;
+    bottom: 0; left: 0;
+    height: 3px;
+    background: #f59e0b;
+    transition: width 0.4s ease;
+    z-index: 100;
+  }
+
+  /* ── Slide counter ── */
+  #counter {
+    position: fixed;
+    bottom: 14px;
+    right: 22px;
+    font-size: 0.75rem;
+    color: #374151;
+    z-index: 100;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Nav hint ── */
+  #hint {
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.72rem;
+    color: #1f2937;
+    z-index: 100;
+    letter-spacing: 0.06em;
+    transition: color 0.4s;
+  }
+  #hint:hover { color: #374151; }
+
+  /* ── VS divider ── */
+  .vs-row {
+    display: flex;
+    align-items: center;
+    gap: clamp(20px,4vw,48px);
+    margin-top: clamp(20px,4vh,36px);
+    width: min(700px, 86vw);
+  }
+  .vs-box {
+    flex: 1;
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 12px;
+    padding: clamp(14px,3vh,24px);
+    font-size: clamp(0.9rem, 2vw, 1.3rem);
+    line-height: 1.6;
+  }
+  .vs-box.active-box {
+    border-color: #f59e0b;
+    background: rgba(245,158,11,0.06);
+    color: #f59e0b;
+    font-weight: 700;
+  }
+  .vs-sep {
+    font-size: clamp(1rem, 2.5vw, 1.8rem);
+    color: #4b5563;
+    font-weight: 900;
+  }
+
+  /* ── Outro ── */
+  .outro-card {
+    background: #111827;
+    border: 1px solid #374151;
+    border-radius: 16px;
+    padding: clamp(20px,4vh,40px) clamp(24px,6vw,56px);
+    margin-top: clamp(20px,4vh,36px);
+    max-width: min(640px, 84vw);
+  }
+  .outro-card p {
+    font-size: clamp(0.95rem, 2vw, 1.3rem);
+    line-height: 1.9;
+    color: #9ca3af;
+  }
+  .outro-card strong {
+    color: #f0f0f0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ░░ SLIDE 1: HOOK ░░ -->
+<div class="slide active" id="s1">
+  <div class="label">BORDERLINE INTELLIGENCE</div>
+  <div class="main">境界知能は<br><span class="accent">7人に1人</span>いる</div>
+  <div class="sub">最近、SNSやニュースでよく見る数字だ。</div>
+</div>
+
+<!-- ░░ SLIDE 2: HOOK 2 ░░ -->
+<div class="slide" id="s2">
+  <div class="main">この数字の<br><span class="accent">正体</span>、知ってますか？</div>
+  <div class="sub">どこから来た数字なのか——少し立ち止まって考えてほしい。</div>
+</div>
+
+<!-- ░░ SLIDE 3: DEFINITION ░░ -->
+<div class="slide" id="s3">
+  <div class="label">境界知能とは</div>
+  <div class="main">IQ <span class="accent">70〜85</span> の<br>グレーゾーン</div>
+  <div class="sub">知的障害（IQ 70未満）と平均（IQ 85以上）のあいだ</div>
+  <div class="iq-diagram">
+    <div class="iq-track">
+      <div class="iq-center"></div>
+      <div class="iq-fill" style="left:25%; width:20%; opacity:0.4;"></div>
+      <div class="iq-fill" style="left:25%; width:20%;"></div>
+      <div class="iq-zone" style="left:35%;">境界知能</div>
+    </div>
+    <div class="iq-labels">
+      <span>IQ 55</span>
+      <span class="dim">70</span>
+      <span>85</span>
+      <span class="dim">100（平均）</span>
+      <span>115</span>
+      <span class="dim">130</span>
+    </div>
+  </div>
+</div>
+
+<!-- ░░ SLIDE 4: MATH ░░ -->
+<div class="slide" id="s4">
+  <div class="label">正規分布の数学</div>
+  <div class="main">IQ 70〜85 の範囲には<br>統計的に <span class="accent">約13.6%</span> が収まる</div>
+  <div class="sub">標準偏差±1〜2の範囲——設計の時点で決まっている数字だ</div>
+</div>
+
+<!-- ░░ SLIDE 5: 7 IN 1 ░░ -->
+<div class="slide" id="s5">
+  <div class="big">7人に1人</div>
+  <div class="sub" style="margin-top:clamp(16px,3vh,28px);">＝ 13.6% から来ている</div>
+</div>
+
+<!-- ░░ SLIDE 6: PIVOT ░░ -->
+<div class="slide" id="s6">
+  <div class="label">ここで問いたい</div>
+  <div class="main">この数字は<br><span class="accent">どうやって</span>生まれたのか</div>
+</div>
+
+<!-- ░░ SLIDE 7: VS ░░ -->
+<div class="slide" id="s7">
+  <div class="main" style="font-size:clamp(1.4rem,3.5vw,2.6rem);">「7人に1人」は——</div>
+  <div class="vs-row">
+    <div class="vs-box">現実の中に存在していたものを<br><strong>「発見」</strong>した数字か</div>
+    <div class="vs-sep">?</div>
+    <div class="vs-box active-box">カテゴリーを定義した結果として<br>「生まれた」数字か</div>
+  </div>
+</div>
+
+<!-- ░░ SLIDE 8: ANSWER ░░ -->
+<div class="slide" id="s8">
+  <div class="label">答え</div>
+  <div class="main"><span class="accent">後者</span>だ</div>
+  <div class="sub">調べて出てきた数字ではなく<br>定義によって導かれた数字だ</div>
+</div>
+
+<!-- ░░ SLIDE 9: MECHANISM ░░ -->
+<div class="slide" id="s9">
+  <div class="sub" style="color:#e5e7eb; font-size:clamp(1rem,2.4vw,1.6rem); max-width:min(660px,84vw); line-height:1.9;">
+    IQを正規分布で設計した時点で<br>
+    平均から1〜2標準偏差下に収まる人の割合は<br>
+    <span class="accent" style="font-weight:700;">数学的にもう決まっていた</span>
+  </div>
+  <div class="quote" style="margin-top:clamp(16px,3vh,30px);">
+    <p>「境界知能」という名前をその範囲につけた瞬間——<br>
+    7人に1人という数字は<span style="color:#f59e0b; font-weight:700;">自動的に確定した</span>。</p>
+  </div>
+</div>
+
+<!-- ░░ SLIDE 10: STRUCTURE ░░ -->
+<div class="slide" id="s10">
+  <div class="label">統計カテゴリーの構造</div>
+  <div class="main" style="font-size:clamp(1.6rem,4vw,3rem);">「定義 → 数値」<br><span class="dim" style="font-size:0.6em;">であって</span><br>「発見 → 数値」<br><span class="dim" style="font-size:0.6em;">ではない</span></div>
+</div>
+
+<!-- ░░ SLIDE 11: 3 STEPS ░░ -->
+<div class="slide" id="s11">
+  <div class="label">カテゴリーが作られる順番</div>
+  <ul class="steps">
+    <li><span class="step-n">①</span>どこかに<strong>線を引く</strong>（定義する）</li>
+    <li><span class="step-n">②</span>線の内側に入る人を<strong>数える</strong></li>
+    <li><span class="step-n">③</span>「<strong>○人に1人がXだ</strong>」と言う</li>
+  </ul>
+</div>
+
+<!-- ░░ SLIDE 12: OTHER EXAMPLES ░░ -->
+<div class="slide" id="s12">
+  <div class="label">同じ構造の例</div>
+  <div class="main" style="font-size:clamp(1.3rem,3.2vw,2.4rem);">線の位置が変われば<br><span class="accent">有病率も変わる</span></div>
+  <div class="chips">
+    <div class="chip">高血圧の基準値</div>
+    <div class="chip">貧困線</div>
+    <div class="chip">肥満（BMI）</div>
+    <div class="chip">境界知能</div>
+  </div>
+</div>
+
+<!-- ░░ SLIDE 13: THE TRAP ░░ -->
+<div class="slide" id="s13">
+  <div class="label">落とし穴</div>
+  <div class="main" style="font-size:clamp(1.5rem,3.8vw,3rem);">数字が現実を映す<br><span class="accent">鏡だと思い込む</span></div>
+  <div class="sub">数字の作られ方を知らないまま受け取ると<br>議論の地に足がつかなくなる</div>
+</div>
+
+<!-- ░░ SLIDE 14: WHY 85 ░░ -->
+<div class="slide" id="s14">
+  <div class="label">問えるかどうか</div>
+  <div class="main">なぜ <span class="accent">85</span> なのか</div>
+  <div class="sub">なぜ 80 ではなく<br>なぜ 90 でもなく——85 なのか<br><br>
+  その根拠を問えることが<br>統計リテラシーの核心にある</div>
+</div>
+
+<!-- ░░ SLIDE 15: THE QUESTION ░░ -->
+<div class="slide" id="s15">
+  <div class="label">数字を見たときに持つべき問い</div>
+  <div class="q-box">
+    <p>この数字は<br>何をどう<span style="color:#f59e0b;">定義</span>した結果か？</p>
+  </div>
+</div>
+
+<!-- ░░ SLIDE 16: CONCLUSION ░░ -->
+<div class="slide" id="s16">
+  <div class="main">数値は先に<span class="accent">こない</span><br>定義が先に<span class="accent">ある</span></div>
+</div>
+
+<!-- ░░ SLIDE 17: OUTRO ░░ -->
+<div class="slide" id="s17">
+  <div class="label">おわりに</div>
+  <div class="main" style="font-size:clamp(1.4rem,3.5vw,2.8rem);">統計の見方が変わると<br>社会の議論の<span class="accent">見え方</span>も変わる</div>
+  <div class="outro-card">
+    <p>
+      <strong>チャンネル登録・高評価</strong>よろしくお願いします<br>
+      記事はプロフィールのリンクから読めます<br>
+      <span class="dim">kiyo-field-notes.vercel.app</span>
+    </p>
+  </div>
+</div>
+
+<!-- ── UI elements ── -->
+<div id="progress" style="width:5.88%;"></div>
+<div id="counter">1 / 17</div>
+<div id="hint">← → / Space で切り替え　F で全画面</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  function go(n) {
+    slides[current].classList.remove('active');
+    current = (n + total) % total;
+    slides[current].classList.add('active');
+    const pct = ((current + 1) / total * 100).toFixed(2);
+    document.getElementById('progress').style.width = pct + '%';
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + total;
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ')  { e.preventDefault(); go(current + 1); }
+    if (e.key === 'ArrowLeft')                    { e.preventDefault(); go(current - 1); }
+    if (e.key === 'f' || e.key === 'F')           { toggleFS(); }
+  });
+
+  document.addEventListener('click', e => {
+    if (e.clientX > window.innerWidth / 2) go(current + 1);
+    else go(current - 1);
+  });
+
+  function toggleFS() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+
+  // Hide hint after 4s
+  setTimeout(() => { document.getElementById('hint').style.color = 'transparent'; }, 4000);
+</script>
+</body>
+</html>
