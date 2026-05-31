@@ -22,7 +22,7 @@ PITCH = "110"    # base frequency Hz (male voice default ~120)
 W, H  = 1920, 1080
 FPS   = 30
 FADE  = 15        # fade frames between slides
-SR    = 16000     # open-jtalk default output SR
+SR    = 48000     # open-jtalk actual output SR (auto-detected below)
 MIN_HOLD = 3      # minimum slide hold (seconds)
 
 # ── Narration texts ───────────────────────────────────────────
