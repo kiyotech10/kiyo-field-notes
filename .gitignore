@@ -31,3 +31,4 @@ pnpm-debug.log*
 src/pages/paypay-tracker.astro
 
 note-export/
+__pycache__/
