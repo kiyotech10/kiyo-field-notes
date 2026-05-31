@@ -17,7 +17,7 @@ TMP.mkdir(exist_ok=True)
 DIC   = "/var/lib/mecab/dic/open-jtalk/naist-jdic"
 VOICE = "/usr/share/hts-voice/nitech-jp-atr503-m001/nitech_jp_atr503_m001.htsvoice"
 RATE  = "0.95"   # speaking rate (1.0=normal, 0.9=slow)
-PITCH = "110"    # base frequency Hz (male voice default ~120)
+PITCH = "120"    # base frequency Hz
 
 W, H  = 1920, 1080
 FPS   = 30
@@ -100,7 +100,7 @@ def speak(text, out_wav):
         ["open_jtalk",
          "-x", DIC, "-m", VOICE,
          "-r", RATE, "-fm", PITCH,
-         "-u", "0.5", "-jm", "0.5",
+         "-u", "0.3",
          "-ow", str(out_wav)],
         input=text.encode("utf-8"),
         capture_output=True
@@ -122,7 +122,22 @@ def arr_to_wav(arr, sr, path):
         w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr)
         w.writeframes(np.clip(arr, -32768, 32767).astype(np.int16).tobytes())
 
-def fade_in_out(arr, ms=60):
+def trim_leading_silence(arr, sr, threshold=600, pad_ms=80):
+    """先頭の無音を除去し pad_ms だけ残す"""
+    for i in range(len(arr)):
+        if abs(arr[i]) > threshold:
+            keep = max(0, i - int(pad_ms / 1000 * sr))
+            return arr[keep:]
+    return arr
+
+def normalize(arr, target=29000):
+    """ピークを target (≈90% of 32768) に正規化"""
+    peak = np.abs(arr).max()
+    if peak > 0:
+        arr = arr * (target / peak)
+    return arr
+
+def fade_in_out(arr, ms=40):
     n = int(ms / 1000 * SR)
     if len(arr) > n * 2:
         arr = arr.copy()
@@ -156,6 +171,8 @@ def main():
         wav = TMP / f"seg{i:02d}.wav"
         speak(text, wav)
         arr, sr = wav_to_arr(wav)
+        arr = trim_leading_silence(arr, sr)
+        arr = normalize(arr)
         arr = fade_in_out(arr)
         speech_arrs.append((arr, sr))
         dur = len(arr) / sr
@@ -204,6 +221,7 @@ def main():
 
     # 4. Build full audio track aligned to video
     print("Building audio track...")
+    # 全セグメント結合後に再正規化（セグメント間の音量ばらつき解消）
     all_audio = []
     for i, ((arr, sr), hold) in enumerate(zip(speech_arrs, holds)):
         # Pad speech with silence to fill the full slot
@@ -216,6 +234,7 @@ def main():
         all_audio.append(arr)
 
     full_audio = np.concatenate(all_audio)
+    full_audio = normalize(full_audio, target=29000)  # 全体を再正規化
     audio_wav  = TMP / "full_audio.wav"
     arr_to_wav(full_audio, SR, audio_wav)
 
