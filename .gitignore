@@ -30,3 +30,4 @@ pnpm-debug.log*
 # Keep PayPay Tracker local-only (never commit/deploy to the web)
 src/pages/paypay-tracker.astro
 
+note-export/
